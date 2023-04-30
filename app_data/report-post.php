@@ -22,13 +22,13 @@ $player1_name = $players[$player1]['name'];
 $player2_name = $players[$player2]['name'];
 
 // setting up content and colors for the ticker embeds
-$player1_result = 
- '**AVG:** ' .
- $players[$player1]['avg'] .  
- ' | **LGS:** ' .
- $players[$player1]['legsWon'] .
- ' | **PKT:** ' .
- ($players[$player1]['winner'] ? $rest['diff'] : 0);
+$player1_result =
+  '**AVG:** ' .
+  $players[$player1]['avg'] .
+  ' | **LGS:** ' .
+  $players[$player1]['legsWon'] .
+  ' | **PKT:** ' .
+  ($players[$player1]['winner'] ? $rest['diff'] : 0);
 $player2_result =
   '**AVG:** ' .
   $players[$player2]['avg'] .
@@ -109,6 +109,7 @@ $json_data = [
 // requests with embeds need to be json encoded
 $json_string = json_encode($json_data, JSON_PRETTY_PRINT);
 
+ob_start();
 // seeting up, running and closing curl
 $curl = curl_init($webhookurl_ticker);
 curl_setopt($curl, CURLOPT_TIMEOUT, 10); // 5 seconds
@@ -119,12 +120,11 @@ curl_setopt($curl, CURLOPT_HTTPHEADER, [
   "Content-Type: application/json"
 ]);
 
-$response = curl_exec($curl);
+curl_exec($curl);
 
 curl_close($curl);
 
-// adding delimeter and line break so responses of curl could theoretically be parsed as valid json
-echo ",\n";
+$response1 = ob_get_clean();
 
 /**
  * post image to #╠📋┃auto-berichte 
@@ -149,8 +149,8 @@ $csv_data_array = [
   4 => $players[$player2]['winner'] ? $rest['diff'] : 0,
   5 => $cancelled ?  '' : $players[$player1]['legsWon'],
   6 => $cancelled ?  '' : $players[$player2]['legsWon'],
-  7 => $cancelled ?  '' : number_format($players[$player1]['avg'],2,',','.'),
-  8 => $cancelled ?  '' : number_format($players[$player2]['avg'],2,',','.'),
+  7 => $cancelled ?  '' : number_format($players[$player1]['avg'], 2, ',', '.'),
+  8 => $cancelled ?  '' : number_format($players[$player2]['avg'], 2, ',', '.'),
   9 => $cancelled ? '' : ($players[$player1]['one80s'] == 0 ? '' : $players[$player1]['one80s']),
   10 => $cancelled ? '' : ($players[$player2]['one80s'] == 0 ? '' : $players[$player2]['one80s']),
   11 => $cancelled ? '' : ($players[$player1]['one71s'] == 0 ? '' : $players[$player1]['one71s']),
@@ -168,7 +168,7 @@ $csv_data_array = [
 ];
 
 // convert array to string
-$csv_result = "```" . implode(';',$csv_data_array) . "```";
+$csv_result = "```" . implode(';', $csv_data_array) . "```";
 
 // setup request data to send to webhook
 // request with file is not being encoded as json!
@@ -179,22 +179,40 @@ $request_data = [
 ];
 
 // setting up, running and closing curl
+ob_start();
 $curl = curl_init($webhookurl_report);
 curl_setopt($curl, CURLOPT_TIMEOUT, 10); // 5 seconds
 curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 10); // 5 seconds
 curl_setopt($curl, CURLOPT_POST, 1);
 curl_setopt($curl, CURLOPT_POSTFIELDS, $request_data);
 
-$response = curl_exec($curl);
+curl_exec($curl);
 
 curl_close($curl);
 
-// writing report csv string to file
-// TODO: if line with game number already present, delete and overwrite?
-$berichteFile = fopen("app_data/ergebnisse.csv", "a");
-fwrite($berichteFile, $csv_result . "\n");
-fclose($berichteFile);
+$response2 = ob_get_clean();
 
-return false;
+// check if response is empty string, if set to true, else decode json;
+$response1 = $response1 == '' ? true : json_decode($response1, TRUE);
+$response2 = $response2 == '' ? true : json_decode($response2, TRUE);
 
-?>
+// if decoded json check if array key 'code' exists, it should only be present if something went wrong;
+$response1_no_errors = is_bool($response1) ? true : !array_key_exists('code', $response1);
+$response2_no_errors = is_bool($response2) ? true : !array_key_exists('code', $response2);
+
+
+if ((is_bool($response1) || $response1_no_errors) && (is_bool($response2) || $response2_no_errors) ) {
+
+  // writing report csv string to file
+  // TODO: if line with game number already present, delete and overwrite?
+  $berichteFile = fopen("app_data/ergebnisse.csv", "a");
+  fwrite($berichteFile, $csv_result . "\n");
+  fclose($berichteFile);
+} else {
+  includeWithVariables('app_data/report-error.php', array(
+    'webhook_errors' => [$response1, $response2],
+    'error_reason' => 'webhookErrors' 
+  ));
+}
+
+return;
