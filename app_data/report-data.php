@@ -28,10 +28,8 @@ function get_game_data($game_hash)
     $json = file_get_contents("https://lidarts.org/api/game/{$game_hash}");
     // turn api json to array, "match_json" entry is json saved as string
     $gameData = json_decode($json, true);
-    // turn api entry "match_json" from string to array
-    $gameData["match_json"] = json_decode($gameData["match_json"]);
-    // convert to associative array
-    $gameData = json_decode(json_encode($gameData), TRUE);
+    // turn api entry "match_json" from string to associative array
+    $gameData["match_json"] = json_decode($gameData["match_json"], TRUE);
   }
 
   $date = $gameData["begin"];
