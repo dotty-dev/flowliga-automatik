@@ -1,11 +1,13 @@
 <?php
 
-// if on dev use test server webhooks, else use live
-if (file_exists('DEVMACHINE')) {
-  include("./app_data/webhook-dev.php");
-  } else {
-  //include("./app_data/webhook-live.php");
-}
+/**
+ * Include the webhooks for discord
+ * the variables should be
+ * $webhook_report for the channel the image is posted to
+ * and
+ * $webhook_ticker for the ticker channel
+ */
+include("./app_data/webhook.php");
 
 $player1 = 1;
 $player2 = 2;
@@ -108,7 +110,7 @@ $json_data = [
 $json_string = json_encode($json_data, JSON_PRETTY_PRINT);
 
 // seeting up, running and closing curl
-$curl = curl_init($webhookurl_kurz);
+$curl = curl_init($webhookurl_ticker);
 curl_setopt($curl, CURLOPT_TIMEOUT, 10); // 5 seconds
 curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 10); // 5 seconds
 curl_setopt($curl, CURLOPT_POST, 1);
@@ -177,7 +179,7 @@ $request_data = [
 ];
 
 // setting up, running and closing curl
-$curl = curl_init($webhookurl_bericht);
+$curl = curl_init($webhookurl_report);
 curl_setopt($curl, CURLOPT_TIMEOUT, 10); // 5 seconds
 curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 10); // 5 seconds
 curl_setopt($curl, CURLOPT_POST, 1);
