@@ -1,0 +1,22 @@
+{
+  "name": "spielbericht-automatik",
+  "version": "1.0.0",
+  "description": "Tool to automatically generate game reports for [FlowLiga Online Darts League](https://www.dartzentrum-augsburg.de/flow-dartsliga) from [lidarts](https://lidarts.org) games api.",
+  "main": "index.js",
+  "scripts": {
+    "tailwind": "npx tailwindcss -i ./src/input.css -o ./assets/style.css --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AlexisDot/flowliga-automatik.git"
+  },
+  "author": "Dotty",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/AlexisDot/flowliga-automatik/issues"
+  },
+  "homepage": "https://github.com/AlexisDot/flowliga-automatik#readme",
+  "devDependencies": {
+    "tailwindcss": "^3.3.2"
+  }
+}

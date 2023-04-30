@@ -1,0 +1,13 @@
+RewriteEngine On
+RewriteBase /
+
+<FilesMatch "\.(?:csv)$">
+  Order allow,deny
+  Deny from all
+</FilesMatch>
+
+# the following prevents display of the filetohide file
+<files spiele.csv>
+  order allow,deny
+  deny from all
+</files>

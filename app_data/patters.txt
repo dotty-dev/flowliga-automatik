@@ -1,0 +1,4 @@
+{Sieger} win's the match, {Verlierer} was left in the rain.
+Bad day for {Verlierer}, maybe next time.
+"EUREKA!" - {Sieger}
+"It's one of those days, aint it?" - {Verlierer}
