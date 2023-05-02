@@ -281,17 +281,23 @@ if (isset($players)) {
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <!-- <link rel="stylesheet" href="assets/style.css"> -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+  <link rel="stylesheet" href="assets/pico-custom.css">
   <title>Flow Liga Spielbericht Automatik</title>
 </head>
 
 <body>
-  <?php 
-  if(isset($image_base64)) {
-    echo "<img src=\"$image_base64\" />";
-  } 
-  ?>
-  <div>
-  </div>
+  <main class="container">
+    <article>
+      <report-img-area>
+        <?php
+        if (isset($image_base64)) {
+          echo "<img class=\"report-img\" src=\"$image_base64\" />";
+        }
+        ?>
+      </report-img-area>
+    </article>
+  </main>
 
 
 </body>

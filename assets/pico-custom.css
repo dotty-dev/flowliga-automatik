@@ -1,0 +1,33 @@
+:root {
+  --primary: hsl(135, 49%, 40%);
+  --primary-hover: hsl(135, 49%, 30%);
+  --primary-focus: hsla(135, 49%, 30%, 0.125);
+}
+
+img {
+  border-radius: 5px;
+}
+
+report-img-area {
+  display: flex;
+  justify-content: center;
+}
+
+@media only screen and (prefers-color-scheme: light) {
+  report-img > img {
+    border: 1px solid black;
+  }
+}
+
+@media only screen and (prefers-color-scheme: dark) {
+  report-img {
+    display: flex;
+    justify-self: center;
+    align-self: center;
+  }
+
+  report-img > img {
+    filter: sepia(1) hue-rotate(300deg) saturate(4) invert(1) contrast(0.8);
+    border: 1px solid black; /* actual border color is white due to filter */
+  }
+}
