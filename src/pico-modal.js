@@ -1,5 +1,3 @@
-"use strict";
-
 /*
  * Modal
  *
@@ -8,31 +6,40 @@
  */
 
 // Config
-var isOpenClass = 'modal-is-open';
-var openingClass = 'modal-is-opening';
-var closingClass = 'modal-is-closing';
-var animationDuration = 400; // ms
-var visibleModal = null;
+const isOpenClass = 'modal-is-open';
+const openingClass = 'modal-is-opening';
+const closingClass = 'modal-is-closing';
+const animationDuration = 400; // ms
+let visibleModal = null;
 
 // Toggle modal
-var toggleModal = function toggleModal(event) {
+const toggleModal = (event) => {
   event.preventDefault();
-  var modal = document.getElementById(event.currentTarget.getAttribute('data-target'));
-  typeof modal != 'undefined' && modal != null && isModalOpen(modal) ? closeModal(modal) : openModal(modal);
+  const modal = document.getElementById(
+    event.currentTarget.getAttribute('data-target')
+  );
+  typeof modal != 'undefined' && modal != null && isModalOpen(modal)
+    ? closeModal(modal)
+    : openModal(modal);
 };
 
 // Is modal open
-var isModalOpen = function isModalOpen(modal) {
-  return modal.hasAttribute('open') && modal.getAttribute('open') != 'false' ? true : false;
+const isModalOpen = (modal) => {
+  return modal.hasAttribute('open') && modal.getAttribute('open') != 'false'
+    ? true
+    : false;
 };
 
 // Open modal
-var openModal = function openModal(modal) {
+const openModal = (modal) => {
   if (isScrollbarVisible()) {
-    document.documentElement.style.setProperty('--scrollbar-width', "".concat(getScrollbarWidth(), "px"));
+    document.documentElement.style.setProperty(
+      '--scrollbar-width',
+      `${getScrollbarWidth()}px`
+    );
   }
   document.documentElement.classList.add(isOpenClass, openingClass);
-  setTimeout(function () {
+  setTimeout(() => {
     visibleModal = modal;
     document.documentElement.classList.remove(openingClass);
   }, animationDuration);
@@ -40,10 +47,10 @@ var openModal = function openModal(modal) {
 };
 
 // Close modal
-var closeModal = function closeModal(modal) {
+const closeModal = (modal) => {
   visibleModal = null;
   document.documentElement.classList.add(closingClass);
-  setTimeout(function () {
+  setTimeout(() => {
     document.documentElement.classList.remove(closingClass, isOpenClass);
     document.documentElement.style.removeProperty('--scrollbar-width');
     modal.removeAttribute('open');
@@ -51,43 +58,44 @@ var closeModal = function closeModal(modal) {
 };
 
 // Close with a click outside
-document.addEventListener('click', function (event) {
+document.addEventListener('click', (event) => {
   if (visibleModal != null) {
-    var modalContent = visibleModal.querySelector('article');
-    var isClickInside = modalContent.contains(event.target);
+    const modalContent = visibleModal.querySelector('article');
+    const isClickInside = modalContent.contains(event.target);
     !isClickInside && closeModal(visibleModal);
   }
 });
 
 // Close with Esc key
-document.addEventListener('keydown', function (event) {
+document.addEventListener('keydown', (event) => {
   if (event.key === 'Escape' && visibleModal != null) {
     closeModal(visibleModal);
   }
 });
 
 // Get scrollbar width
-var getScrollbarWidth = function getScrollbarWidth() {
+const getScrollbarWidth = () => {
   // Creating invisible container
-  var outer = document.createElement('div');
+  const outer = document.createElement('div');
   outer.style.visibility = 'hidden';
   outer.style.overflow = 'scroll'; // forcing scrollbar to appear
   outer.style.msOverflowStyle = 'scrollbar'; // needed for WinJS apps
   document.body.appendChild(outer);
 
   // Creating inner element and placing it in the container
-  var inner = document.createElement('div');
+  const inner = document.createElement('div');
   outer.appendChild(inner);
 
   // Calculating difference between container's full width and the child width
-  var scrollbarWidth = outer.offsetWidth - inner.offsetWidth;
+  const scrollbarWidth = outer.offsetWidth - inner.offsetWidth;
 
   // Removing temporary elements from the DOM
   outer.parentNode.removeChild(outer);
+
   return scrollbarWidth;
 };
 
 // Is scrollbar visible
-var isScrollbarVisible = function isScrollbarVisible() {
+const isScrollbarVisible = () => {
   return document.body.scrollHeight > screen.height;
 };

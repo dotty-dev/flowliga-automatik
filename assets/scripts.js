@@ -1,9 +1,11 @@
-function loadGame() {
-  loadButton.classList.add('is-busy');
-  loadButton.disabled = true;
-  const gameUrlInput = document.querySelector('#game-link')
-  const gameURL = gameUrlInput.value;
+"use strict";
 
+function loadGame(event) {
+  event.preventDefault();
+  loadButton.disabled = true;
+  loadButton.setAttribute('aria-busy', 'true');
+  var gameUrlInput = document.querySelector('#game-link');
+  var gameURL = gameUrlInput.value;
   var gameHash = '';
   var prefixHttps = 'https://lidarts.org/game/';
   var prefixHttp = 'http://lidarts.org/game/';
@@ -15,49 +17,31 @@ function loadGame() {
     gameHash = gameURL.replace(prefixHttp, '');
     isCorrect = true;
   }
-
   if (isCorrect && gameHash.length === 8) {
-    location.href += `?game=${gameHash}`;
+    location.href += "?game=".concat(gameHash);
   } else {
-    loadButton.classList.remove('is-busy');
+    var _document$querySelect;
     loadButton.disabled = false;
     gameUrlInput.setAttribute('aria-invalid', 'true');
-    document.querySelector('validation-error')?.remove();
-    gameUrlInput.insertAdjacentHTML('afterend', /*html*/`
-      <validation-error>Die eingegebene Lidarts-URL scheint fehlerhaft zu sein, bitte überprüfe deine Eingabe.</validation-error>
-    `)
+    loadButton.setAttribute('aria-busy', 'false');
+    (_document$querySelect = document.querySelector('validation-error')) === null || _document$querySelect === void 0 ? void 0 : _document$querySelect.remove();
+    gameUrlInput.insertAdjacentHTML('afterend', /*html*/"<validation-error>Die eingegebene Lidarts-URL scheint fehlerhaft zu sein, bitte \xFCberpr\xFCfe deine Eingabe.</validation-error>");
   }
 }
-
 function populateCanceledGameOptions() {
-  const selectedOption = cancelledGameSelect.selectedOptions[0];
-  const optionsFieldset = selectedOption
-    .closest('form')
-    .querySelector('fieldset');
-
+  var selectedOption = cancelledGameSelect.selectedOptions[0];
+  var optionsFieldset = selectedOption.closest('form').querySelector('fieldset');
   optionsFieldset.innerHTML = '';
-  optionsFieldset.insertAdjacentHTML(
-    'beforeend',
-    /*html*/ `
-  <legend>120 Punkte gehen an</legend>
-  <label for="small">
-    <input type="radio" id="cancelled-points-nobody" name="cancelledPoints" value="0" checked>
-    Niemanden / 0:0
-  </label>
-  <label for="medium">
-    <input type="radio" id="cancelled-points-player1" name="cancelledPoints" value="1">
-    ${selectedOption.dataset.playerLeft}
-  </label>
-  <label for="large">
-    <input type="radio" id="cancelled-points-player2" name="cancelledPoints" value="2">
-    ${selectedOption.dataset.playerRight}
-  </label>
-  `
-  );
+  optionsFieldset.insertAdjacentHTML('beforeend', /*html*/"\n    <legend>120 Punkte gehen an</legend>\n    <label for=\"small\">\n      <input type=\"radio\" id=\"cancelled-points-nobody\" name=\"cancelledPoints\" value=\"0\" checked>\n      Niemanden / 0:0\n    </label>\n    <label for=\"medium\">\n      <input type=\"radio\" id=\"cancelled-points-player1\" name=\"cancelledPoints\" value=\"1\">\n      ".concat(selectedOption.dataset.playerLeft, "\n    </label>\n    <label for=\"large\">\n      <input type=\"radio\" id=\"cancelled-points-player2\" name=\"cancelledPoints\" value=\"2\">\n      ").concat(selectedOption.dataset.playerRight, "\n    </label>"));
 }
-
-const loadButton = document.querySelector('#get-game');
+var loadButton = document.querySelector('#get-game');
 loadButton.addEventListener('click', loadGame);
-
-const cancelledGameSelect = document.querySelector('#game-number');
+var cancelledGameSelect = document.querySelector('#game-number');
 cancelledGameSelect.addEventListener('change', populateCanceledGameOptions);
+var submitButtons = document.querySelectorAll('.btn-submit');
+submitButtons.forEach(function (btn) {
+  btn.addEventListener('click', function (e) {
+    var targetForm = e.currentTarget.closest('dialog').querySelector('form');
+    targetForm.submit();
+  });
+});
