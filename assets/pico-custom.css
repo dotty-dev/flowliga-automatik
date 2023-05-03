@@ -1,3 +1,7 @@
+:root {
+  --spacing: 0.5rem;
+}
+
 [data-theme='light'],
 :root:not([data-theme='dark']) {
   --primary: hsl(135, 49%, 40%);
