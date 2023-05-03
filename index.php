@@ -101,6 +101,8 @@ if (file_exists($players_file)) {
     'error_reason' => 'noPlayersFile'
   ));
 }
+// remove csv header entries 
+array_shift($players_array_trimmed);
 
 
 /** 
@@ -118,6 +120,8 @@ if (file_exists($pairings_file)) {
     'error_reason' => 'noPairingsFile'
   ));
 }
+// remove csv header entries 
+array_shift($games_array_trimmed);
 
 // load game data from lidarts
 if (array_key_exists('game', $_GET)) {
@@ -299,6 +303,7 @@ if (isset($players)) {
         </li>
       </ul>
     </nav>
+
     <?php if (isset($image)) { ?>
       <article>
         <section>
@@ -312,25 +317,70 @@ if (isset($players)) {
         </div>
       </article>
     <?php } ?>
+
     <article>
       <form>
         <label for="game-link">Lidarts-URL</label>
         <input id="game-link" name="game" type="text" placeholder="https://lidarts.org/game/ABCD1234">
         <div class="grid">
           <button type="button" id="get-game">Laden</button>
-          <button type="button" id="cancelled-game">Abgesagt</button>
+          <button type="button" id="cancelled-game" data-target="modal-cancelled-game" onClick="toggleModal(event)">Abgesagt</button>
         </div>
       </form>
     </article>
   </main>
-  <footer>
-    <div class="grid">
-      <small>Made with <a href="https://picocss.com" target="_blank">picoCSS</a></small>
-      <small><a href="" target="_blank"></a></small>
-    </div>
+
+  <footer class="container">
+    <nav>
+      <ul>
+        <li>
+          <small>Made with <a href="https://picocss.com" target="_blank">picoCSS</a></small>
+        </li>
+      </ul>
+      <ul>
+        <li>
+          <small><a href="https://janfromm.de/typefaces/camingocode/" target="_blank">CamingoCode</a> by Jan Fromm</small>
+        </li>
+      </ul>
+    </nav>
   </footer>
 
+  <!-- Modal -->
+  <dialog id="modal-cancelled-game">
+    <article>
+      <a href="#close" aria-label="Close" class="close" data-target="modal-cancelled-game" onClick="toggleModal(event)">
+      </a>
+      <hgroup>
+
+        <h3>Bericht für abgesagtes Spiel erstellen</h3>
+        <h6>Das Dropdown-Feld kann durch eintippen der Spielnummer durchsucht werden</h6>
+      </hgroup>
+      <form>
+        <label for="game-number">Spielnummer</label>
+        <select id="game-number" type="test" placeholder="12345" required>
+          <option selected disabled value></option>
+          <?php
+          foreach ($games_array_trimmed as $pairing) {
+            echo "<option value=\"" . $pairing[0] . "\" data-player-left=\"" . $pairing[1] . "\" data-player-right=\"" . $pairing[2] . "\">" . $pairing[0] . ": " . $pairing[1] . " <-> " . $pairing[2] . "</option>";
+          }
+          ?>
+        </select>
+        <fieldset>
+        </fieldset>
+      </form>
+      <footer>
+        <a href="#cancel" role="button" class="secondary" data-target="modal-cancelled-game" onClick="toggleModal(event)">
+          Abbrechen
+        </a>
+        <a href="" role="button" data-target="modal-cancelled-game" onClick="toggleModal(event)">
+          Erstellen
+        </a>
+      </footer>
+    </article>
+  </dialog>
+
   <script src="assets/scripts.js"></script>
+  <script src="assets/pico-modal.js"></script>
 </body>
 
 </html>
