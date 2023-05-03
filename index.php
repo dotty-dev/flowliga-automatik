@@ -154,19 +154,31 @@ if (array_key_exists('game', $_POST)) {
   }
 }
 
-if (array_key_exists('cancelled', $_GET)) {
+if (array_key_exists('cancelled', $_POST)) {
   $cancelled = true;
-  $game_number = $_GET['cancelled'];
+  $game_number = $_POST['cancelled'];
+  $game_hash = '--------';
   $pairing = get_game_pairing_by_number($games_array_trimmed, $game_number);
   $date = date("d.m.Y");
   $players = [
     1 => [
       "name" => $pairing[1],
-      "winner" => false
+      "one80s" =>  0,
+      "one71s" => 0,
+      "avg" => 0.00,
+      "highestFinish" => 0,
+      "winner" => $_POST['cancelledPoints'] == 1 ? true : false,
+      "legsWon" => 0
+
     ],
     2 => [
       "name" => $pairing[2],
-      "winner" => false
+      "one80s" =>  0,
+      "one71s" => 0,
+      "avg" => 0.00,
+      "highestFinish" => 0,
+      "winner" => $_POST['cancelledPoints'] == 2 ? true : false,
+      "legsWon" => 0
     ]
   ];
 }
@@ -174,44 +186,50 @@ if (array_key_exists('cancelled', $_GET)) {
 
 if (isset($players)) {
 
-  // lookup lidarts names in $players_array_trimmed
-  for ($i = 1; $i < 3; $i++) {
-    $player_keys[$i] = array_search(
-      $players[$i]['name'],
-      array_column($players_array_trimmed, 1)
-    );
-    if ($player_keys[$i] != false) {
-      $players[$i]['name'] = $players_array_trimmed[$player_keys[$i]][0];
-      $players_discord_ids[$i] = $players_array_trimmed[$player_keys[$i]][2];
+  if (!isset($cancelled)) {
+    // lookup lidarts names in $players_array_trimmed
+    for ($i = 1; $i < 3; $i++) {
+      $player_keys[$i] = array_search(
+        $players[$i]['name'],
+        array_column($players_array_trimmed, 1)
+      );
+      if ($player_keys[$i] != false) {
+        $players[$i]['name'] = $players_array_trimmed[$player_keys[$i]][0];
+        $players_discord_ids[$i] = $players_array_trimmed[$player_keys[$i]][2];
+      }
+    }
+
+    // check if either both or one of the players couldn't be looked up and throw error
+    if ($player_keys[1] == false && $player_keys[2] == false) {
+      return includeWithVariables('app_data/report-error.php', array(
+        'player1_name' => $players[1]['name'],
+        'player2_name' => $players[2]['name'],
+        'error_reason' => 'playersNotFoundBoth'
+      ));
+    }
+    if ($player_keys[1] == false) {
+      return includeWithVariables('app_data/report-error.php', array(
+        'player_name' => $players[1]['name'],
+        'error_reason' => 'playerNotFound'
+      ));
+    }
+    if ($player_keys[2] == false) {
+      return includeWithVariables('app_data/report-error.php', array(
+        'player_name' => $players[2]['name'],
+        'error_reason' => 'playerNotFound'
+      ));
     }
   }
 
-  // check if either both or one of the players couldn't be looked up and throw error
-  if ($player_keys[1] == false && $player_keys[2] == false) {
-    return includeWithVariables('app_data/report-error.php', array(
-      'player1_name' => $players[1]['name'],
-      'player2_name' => $players[2]['name'],
-      'error_reason' => 'playersNotFoundBoth'
-    ));
-  }
-  if ($player_keys[1] == false) {
-    return includeWithVariables('app_data/report-error.php', array(
-      'player1_name' => $players[1]['name'],
-      'error_reason' => 'playerNotFound'
-    ));
-  }
-  if ($player_keys[2] == false) {
-    return includeWithVariables('app_data/report-error.php', array(
-      'player1_name' => $players[2]['name'],
-      'error_reason' => 'playerNotFound'
-    ));
-  }
-
   // searching for game pairing 
-  $game_pairing = get_game_pairing(
-    $games_array_trimmed,
-    [$players[1]['name'], $players[2]['name']]
-  );
+  if (isset($pairing)) {
+    $game_pairing = $pairing;
+  } else {
+    $game_pairing = get_game_pairing(
+      $games_array_trimmed,
+      [$players[1]['name'], $players[2]['name']]
+    );
+  }
 
   // report error if no pairing found
   if ($game_pairing == false) {
@@ -228,6 +246,50 @@ if (isset($players)) {
   // set $game_number from $game_pairing, for easier access
   $game_number = $game_pairing[0];
 
+  if (!isset($date)) {
+    $date = date("d.m.Y");
+  }
+
+  if (!isset($rest)) {
+    $rest = [
+      1 => [
+        1 => 0,
+        2 => 0,
+        3 => 0,
+        4 => 0,
+        5 => 0,
+        'sum' => 0
+      ],
+      2 => [
+        1 => 0,
+        2 => 0,
+        3 => 0,
+        4 => 0,
+        5 => 0,
+        'sum' => 0
+      ],
+      'diff' => $_POST['cancelledPoints'] == 0 ? 0 : 120
+    ];
+  }
+
+  if (!isset($finised)) {
+    $finishes = [
+      1 => [
+        1 => 0,
+        2 => 0,
+        3 => 0,
+        4 => 0,
+        5 => 0
+      ],
+      2 => [
+        1 => 0,
+        2 => 0,
+        3 => 0,
+        4 => 0,
+        5 => 0
+      ]
+    ];
+  }
 
   // generate and load report image
   ob_start();
@@ -355,9 +417,9 @@ if (isset($players)) {
         <h3>Bericht für abgesagtes Spiel erstellen</h3>
         <h6>Das Dropdown-Feld kann durch eintippen der Spielnummer durchsucht werden</h6>
       </hgroup>
-      <form>
+      <form method="post">
         <label for="game-number">Spielnummer</label>
-        <select id="game-number" type="test" placeholder="12345" required>
+        <select id="game-number" type="test" placeholder="12345" name="cancelled" required>
           <option selected disabled value></option>
           <?php
           foreach ($games_array_trimmed as $pairing) {
@@ -372,7 +434,7 @@ if (isset($players)) {
         <a href="#cancel" role="button" class="secondary" data-target="modal-cancelled-game" onClick="toggleModal(event)">
           Abbrechen
         </a>
-        <a href="" role="button" data-target="modal-cancelled-game" onClick="toggleModal(event)">
+        <a class="btn-submit" href="#submit" role="button">
           Erstellen
         </a>
       </footer>

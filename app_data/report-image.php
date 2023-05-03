@@ -2,7 +2,7 @@
 
 $player1 = 1;
 $player2 = 2;
-if($switched) {
+if ($switched) {
   $player1 = 2;
   $player2 = 1;
 }
@@ -17,7 +17,7 @@ $black = imagecolorallocate($img, 0, 0, 0);
 $font = "app_data/camingocode/CamingoCode-Bold.ttf";
 
 // standard font size
-$fontSize = 25; 
+$fontSize = 25;
 
 // initial / max player font size
 $player1FontSize = 25;
@@ -29,7 +29,7 @@ $player2_size = imagettfbbox($player2FontSize, 0, $font, $players[$player2]["nam
 $player1_width = max([$player1_size[2], $player1_size[2]]) - min([$player1_size[0], $player1_size[6]]);
 $player2_width = max([$player2_size[2], $player2_size[2]]) - min([$player2_size[0], $player2_size[6]]);
 $player_max_width = 250;
-while($player1_width > $player_max_width) {
+while ($player1_width > $player_max_width) {
   $player1FontSize = $player1FontSize - 1;
   $player1_size = imagettfbbox($player1FontSize, 0, $font, $players[$player1]["name"]);
   $player1_width = max([$player1_size[2], $player1_size[2]]) - min([$player1_size[0], $player1_size[6]]);
@@ -48,7 +48,7 @@ $text_size = imagettfbbox($fontSize, 0, $font, $game_number);
 $text_width = max([$text_size[2], $text_size[4]]) - min([$text_size[0], $text_size[6]]);
 $center_x = CEIL((118 - $text_width) / 2) + 8; // (field width - text-width) / 2 + offset from left
 imagettftext(
-  $img, 
+  $img,
   $fontSize,
   0,
   $center_x,
@@ -59,11 +59,15 @@ imagettftext(
 );
 
 // date
-$dateArray = date_parse($date);
-$dateShort =
-  str_pad($dateArray['day'], 2, '0', STR_PAD_LEFT) .'.'.
-  str_pad($dateArray['month'], 2, '0', STR_PAD_LEFT) .'.'. 
-  $dateArray['year'];
+if (strlen($date) === 10) {
+  $dateShort = $date;
+} else {
+  $dateArray = date_parse($date);
+  $dateShort =
+    str_pad($dateArray['day'], 2, '0', STR_PAD_LEFT) . '.' .
+    str_pad($dateArray['month'], 2, '0', STR_PAD_LEFT) . '.' .
+    $dateArray['year'];
+}
 imagettftext(
   $img, // image object imagecreatefrompng()
   19, // font size
@@ -112,7 +116,8 @@ imagettftext(
   $img,
   $player1FontSize,
   0,
-  10, 282,
+  10,
+  282,
   $black,
   $font,
   $players[$player1]["name"]
@@ -180,7 +185,8 @@ imagettftext(
 
 
 // function for line y_pos for finishes and rest
-function get_leg_y_pos($leg) {
+function get_leg_y_pos($leg)
+{
   switch ($leg) {
     case 1:
       return 430;
@@ -201,7 +207,7 @@ function get_leg_y_pos($leg) {
 }
 
 // player left finishes
-for($i = 1; $i < 6; $i++) {
+for ($i = 1; $i < 6; $i++) {
   $text_size = imagettfbbox($fontSize, 0, $font, $finishes[$player1][$i]);
   $text_width = max([$text_size[2], $text_size[4]]) - min([$text_size[0], $text_size[6]]);
   $center_x = CEIL((95 - $text_width) / 2) + 54; // (field width - text-width) / 2 + offset from left
