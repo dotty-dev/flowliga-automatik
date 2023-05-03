@@ -4,7 +4,7 @@
   "description": "Tool to automatically generate game reports for [FlowLiga Online Darts League](https://www.dartzentrum-augsburg.de/flow-dartsliga) from [lidarts](https://lidarts.org) games api.",
   "main": "index.js",
   "scripts": {
-    "tailwind": "npx tailwindcss -i ./src/input.css -o ./assets/style.css --watch"
+    "babel": "npx babel src --out-dir assets"
   },
   "repository": {
     "type": "git",
@@ -15,5 +15,10 @@
   "bugs": {
     "url": "https://github.com/AlexisDot/flowliga-automatik/issues"
   },
-  "homepage": "https://github.com/AlexisDot/flowliga-automatik#readme"
+  "homepage": "https://github.com/AlexisDot/flowliga-automatik#readme",
+  "devDependencies": {
+    "@babel/cli": "^7.21.5",
+    "@babel/core": "^7.21.8",
+    "@babel/preset-env": "^7.21.5"
+  }
 }
