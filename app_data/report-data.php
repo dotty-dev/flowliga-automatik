@@ -67,7 +67,7 @@ function get_game_data($game_hash)
       3 => 501,
       4 => 501,
       5 => 501,
-      'sum' => 2505
+      'sum' => 0
     ],
     2 => [
       1 => 501,
@@ -75,7 +75,7 @@ function get_game_data($game_hash)
       3 => 501,
       4 => 501,
       5 => 501,
-      'sum' => 2505
+      'sum' => 0
     ],
     'diff' =>  0
   ];
@@ -100,6 +100,10 @@ function get_game_data($game_hash)
 
   // calc rest and get finishes,
   // api structure: each leg has 2 entrys for players with subentries for thrown scores
+  if (array_key_exists('correction', $_POST)) {
+    $correctionFinishes = $_POST["finsihes"];
+    $correctionRest = $_POST["rest"];
+  }
   $legNumber = 0;
   foreach ($gameData["match_json"][1] as $leg) {
     $legNumber++;
@@ -108,21 +112,33 @@ function get_game_data($game_hash)
       foreach ($leg as $player) {
         $i++;
         if (array_key_exists("to_finish", $player)) {
-          //if finish, set last thrown score as finish and set rest to 0, substract 501 from sum
+          // if finish, set last thrown score as finish and set rest to 0, substract 501 from sum
           $rest[$i][$legNumber] = 0;
-          $rest[$i]['sum'] -= 501;
           $finishes[$i][$legNumber] = end($player["scores"]);
           if ($players[$i]['highestFinish'] < end($player["scores"])) {
             $players[$i]['highestFinish'] = end($player["scores"]);
+          }
+        } else if ($legNumber == 5 && isset($correctionFinishes)) {
+          // if the last leg was not correctly checked, accept correction
+          $rest[$i][$legNumber] = $correctionRest[$i-1];
+          $finishes[$i][$legNumber] = $correctionFinishes[$i-1];
+          if ($players[$i]['highestFinish'] < $correctionFinishes[$i-1]) {
+            $players[$i]['highestFinish'] = $correctionFinishes[$i-1];
           }
         } else {
           // else substract all thrown scores to get rest points
           foreach ($player["scores"] as $score) {
             $rest[$i][$legNumber] -= $score;
-            $rest[$i]['sum'] -= $score;
           }
         }
       }
+    }
+  }
+
+  // calc rest sum 
+  for ($i = 1; $i < 3; $i++) {
+    for ($leg = 1; $leg < 6; $leg++) {
+      $rest[$i]['sum'] += $rest[$i][$leg];
     }
   }
 
