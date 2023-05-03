@@ -1,4 +1,5 @@
-:root {
+[data-theme='light'],
+:root:not([data-theme='dark']) {
   --primary: hsl(135, 49%, 40%);
   --primary-hover: hsl(135, 49%, 30%);
   --primary-focus: hsla(135, 49%, 30%, 0.125);
@@ -14,19 +15,25 @@ report-img-area {
 }
 
 @media only screen and (prefers-color-scheme: light) {
-  report-img > img {
+  report-img-area > img {
     border: 1px solid black;
   }
 }
 
 @media only screen and (prefers-color-scheme: dark) {
-  report-img {
+   :root {
+    --primary: hsl(135, 49%, 40%);
+    --primary-hover: hsl(135, 49%, 30%);
+    --primary-focus: hsla(135, 49%, 30%, 0.125);
+  }
+
+  report-img-area {
     display: flex;
     justify-self: center;
     align-self: center;
   }
 
-  report-img > img {
+  report-img-area > img {
     filter: sepia(1) hue-rotate(300deg) saturate(4) invert(1) contrast(0.8);
     border: 1px solid black; /* actual border color is white due to filter */
   }

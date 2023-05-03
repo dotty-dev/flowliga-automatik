@@ -147,7 +147,6 @@ if (array_key_exists('game', $_POST)) {
 } else {
   if (!array_key_exists('game', $_GET)) {
     session_reset();
-    echo 'no game hash';
   }
 }
 
@@ -288,18 +287,50 @@ if (isset($players)) {
 
 <body>
   <main class="container">
+    <nav>
+      <ul>
+        <li>
+          <img src="assets/logo_300_159.png" />
+        </li>
+      </ul>
+      <ul>
+        <li>
+          <h1>Spielbericht Automatik</h1>
+        </li>
+      </ul>
+    </nav>
+    <?php if (isset($image)) { ?>
+      <article>
+        <section>
+          <report-img-area>
+            <img class="report-img" src="<?php echo $image_base64; ?>" />
+          </report-img-area>
+        </section>
+        <div class="grid">
+          <button type="button" id="save-img">💾 Speichern</button>
+          <button type="button" id="post-report">📮 Posten</button>
+        </div>
+      </article>
+    <?php } ?>
     <article>
-      <report-img-area>
-        <?php
-        if (isset($image_base64)) {
-          echo "<img class=\"report-img\" src=\"$image_base64\" />";
-        }
-        ?>
-      </report-img-area>
+      <form>
+        <label for="game-link">Lidarts-URL</label>
+        <input id="game-link" name="game" type="text" placeholder="https://lidarts.org/game/ABCD1234">
+        <div class="grid">
+          <button type="button" id="get-game">Laden</button>
+          <button type="button" id="cancelled-game">Abgesagt</button>
+        </div>
+      </form>
     </article>
   </main>
+  <footer>
+    <div class="grid">
+      <small>Made with <a href="https://picocss.com" target="_blank">picoCSS</a></small>
+      <small><a href="" target="_blank"></a></small>
+    </div>
+  </footer>
 
-
+  <script src="assets/scripts.js"></script>
 </body>
 
 </html>
