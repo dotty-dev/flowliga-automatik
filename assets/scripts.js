@@ -1,5 +1,8 @@
 function loadGame() {
-  const gameURL = document.querySelector('#game-link').value;
+  loadButton.classList.add('is-busy');
+  loadButton.disabled = true;
+  const gameUrlInput = document.querySelector('#game-link')
+  const gameURL = gameUrlInput.value;
 
   var gameHash = '';
   var prefixHttps = 'https://lidarts.org/game/';
@@ -13,8 +16,16 @@ function loadGame() {
     isCorrect = true;
   }
 
-  if (isCorrect) {
+  if (isCorrect && gameHash.length === 8) {
     location.href += `?game=${gameHash}`;
+  } else {
+    loadButton.classList.remove('is-busy');
+    loadButton.disabled = false;
+    gameUrlInput.setAttribute('aria-invalid', 'true');
+    document.querySelector('validation-error')?.remove();
+    gameUrlInput.insertAdjacentHTML('afterend', /*html*/`
+      <validation-error>Die eingegebene Lidarts-URL scheint fehlerhaft zu sein, bitte überprüfe deine Eingabe.</validation-error>
+    `)
   }
 }
 
