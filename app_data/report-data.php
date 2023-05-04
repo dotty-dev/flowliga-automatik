@@ -18,7 +18,7 @@ function remote_file_exists($url)
   return $code < 400;
 }
 
-// extract game data from lidarts api and store into easier managable parts, return array of saif parts
+// extract game data from lidarts api and store into easier managable parts, return array of said parts
 function get_game_data($game_hash)
 {
 
@@ -30,6 +30,13 @@ function get_game_data($game_hash)
     $gameData = json_decode($json, true);
     // turn api entry "match_json" from string to associative array
     $gameData["match_json"] = json_decode($gameData["match_json"], TRUE);
+  }
+
+  if ($gameData["bo_legs"] != 9 || $gameData["bo_sets"] != 1) {
+    includeWithVariables('app_data/report-error.php', array(
+      'error_reason' => 'wrongMode'
+    ));
+    return 'error';
   }
 
   $date = $gameData["begin"];
@@ -151,10 +158,46 @@ function get_game_data($game_hash)
     $players[1]['winner'] = true;
   }
 
+
+  // lookup lidarts names in $players_array
+  for ($i = 1; $i < 3; $i++) {
+    global $players_array;
+    $player_keys[$i] = array_search(
+      $players[$i]['name'],
+      array_column($players_array, 1)
+    );
+    if ($player_keys[$i] != false) {
+      $players[$i]['name'] = $players_array[$player_keys[$i]][0];
+      $players_discord_ids[$i] = $players_array[$player_keys[$i]][2];
+    }
+  }
+
+  // check if either both or one of the players couldn't be looked up and throw error
+  if ($player_keys[1] == false && $player_keys[2] == false) {
+    return includeWithVariables('app_data/report-error.php', array(
+      'player1_name' => $players[1]['name'],
+      'player2_name' => $players[2]['name'],
+      'error_reason' => 'playersNotFoundBoth'
+    ));
+  }
+  if ($player_keys[1] == false) {
+    return includeWithVariables('app_data/report-error.php', array(
+      'player_name' => $players[1]['name'],
+      'error_reason' => 'playerNotFound'
+    ));
+  }
+  if ($player_keys[2] == false) {
+    return includeWithVariables('app_data/report-error.php', array(
+      'player_name' => $players[2]['name'],
+      'error_reason' => 'playerNotFound'
+    ));
+  }
+
   return [
     'date' => $date,
     'players' => $players,
     'rest' => $rest,
-    'finishes' => $finishes
+    'finishes' => $finishes,
+    'discord_ids' => $players_discord_ids
   ];
 }

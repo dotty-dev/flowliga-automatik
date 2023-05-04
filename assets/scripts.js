@@ -1,10 +1,15 @@
 "use strict";
 
+var gameUrlInput = document.querySelector('#game-link');
+var loadButton = document.querySelector('#get-game');
+var cancelledButton = document.querySelector('#cancelled-game');
+var submitButtons = document.querySelectorAll('.btn-submit');
+var cancelledGameSelect = document.querySelector('#game-number');
+var postButton = document.querySelector('#post-report');
 function loadGame(event) {
   event.preventDefault();
   loadButton.disabled = true;
   loadButton.setAttribute('aria-busy', 'true');
-  var gameUrlInput = document.querySelector('#game-link');
   var gameURL = gameUrlInput.value;
   var gameHash = '';
   var prefixHttps = 'https://lidarts.org/game/';
@@ -32,16 +37,35 @@ function populateCanceledGameOptions() {
   var selectedOption = cancelledGameSelect.selectedOptions[0];
   var optionsFieldset = selectedOption.closest('form').querySelector('fieldset');
   optionsFieldset.innerHTML = '';
-  optionsFieldset.insertAdjacentHTML('beforeend', /*html*/"\n    <legend>120 Punkte gehen an</legend>\n    <label for=\"small\">\n      <input type=\"radio\" id=\"cancelled-points-nobody\" name=\"cancelledPoints\" value=\"0\" checked>\n      Niemanden / 0:0\n    </label>\n    <label for=\"medium\">\n      <input type=\"radio\" id=\"cancelled-points-player1\" name=\"cancelledPoints\" value=\"1\">\n      ".concat(selectedOption.dataset.playerLeft, "\n    </label>\n    <label for=\"large\">\n      <input type=\"radio\" id=\"cancelled-points-player2\" name=\"cancelledPoints\" value=\"2\">\n      ").concat(selectedOption.dataset.playerRight, "\n    </label>"));
+  optionsFieldset.insertAdjacentHTML('beforeend', /*html*/"\n    <legend>120 Punkte gehen an</legend>\n    <label for=\"cancelled-points-nobody\">\n      <input type=\"radio\" id=\"cancelled-points-nobody\" name=\"cancelledPoints\" value=\"0\" checked>\n      Niemanden / 0:0\n    </label>\n    <label for=\"cancelled-points-player1\">\n      <input type=\"radio\" id=\"cancelled-points-player1\" name=\"cancelledPoints\" value=\"1\">\n      ".concat(selectedOption.dataset.playerLeft, "\n    </label>\n    <label for=\"cancelled-points-player2\">\n      <input type=\"radio\" id=\"cancelled-points-player2\" name=\"cancelledPoints\" value=\"2\">\n      ").concat(selectedOption.dataset.playerRight, "\n    </label>"));
 }
-var loadButton = document.querySelector('#get-game');
 loadButton.addEventListener('click', loadGame);
-var cancelledGameSelect = document.querySelector('#game-number');
-cancelledGameSelect.addEventListener('change', populateCanceledGameOptions);
-var submitButtons = document.querySelectorAll('.btn-submit');
-submitButtons.forEach(function (btn) {
-  btn.addEventListener('click', function (e) {
-    var targetForm = e.currentTarget.closest('dialog').querySelector('form');
-    targetForm.submit();
-  });
+cancelledButton.addEventListener('click', function () {
+  if (gameUrlInput.value.length >= 4 && gameUrlInput.value.length <= 7) {
+    var gamePairingOption = Array.from(cancelledGameSelect.options).filter(function (o) {
+      return o.value == gameUrlInput.value;
+    })[0];
+    if (gamePairingOption) {
+      gamePairingOption.selected = true;
+    }
+    cancelledGameSelect.dispatchEvent(new Event('change'));
+  }
 });
+cancelledGameSelect.addEventListener('change', populateCanceledGameOptions);
+function submitFunction(e) {
+  var targetForm = e.currentTarget.closest('dialog').querySelector('form');
+  targetForm.submit();
+}
+;
+function postToDiscord() {
+  var form = document.createElement('form');
+  form.style.display = 'none';
+  var element1 = document.createElement('input');
+  form.method = 'POST';
+  element1.value = true;
+  element1.name = 'postResult';
+  form.appendChild(element1);
+  document.body.appendChild(form);
+  form.submit();
+}
+postButton.addEventListener('click', postToDiscord);
