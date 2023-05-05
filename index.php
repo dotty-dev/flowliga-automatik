@@ -186,14 +186,22 @@ if (isset($players)) {
         </li>
       </ul>
       <ul>
+        <li><small><a href="https://github.com/be5invis/Iosevka" target="_blank">Iosveka</a> by Belleve Invis</small></li>
+      </ul>
+      <ul>
         <li>
           <small><a href="https://janfromm.de/typefaces/camingocode/" target="_blank">CamingoCode</a> by Jan Fromm</small>
+        </li>
+      </ul>
+      <ul>
+        <li>
+          <small><a href="#imprint" data-target="modal-imprint" onClick="toggleModal(event)">Imprint</a></small>
         </li>
       </ul>
     </nav>
   </footer>
 
-  <!-- Modal -->
+  <!-- Modals -->
   <dialog id="modal-cancelled-game">
     <article>
       <a href="#close" aria-label="Close" class="close" data-target="modal-cancelled-game" onClick="toggleModal(event)">
@@ -222,6 +230,22 @@ if (isset($players)) {
         </a>
         <a class="btn-submit" href="#submit" role="button" onClick="submitFunction(event)">
           Erstellen
+        </a>
+      </footer>
+    </article>
+  </dialog>
+
+  <dialog id="modal-imprint">
+    <article>
+      <a href="#close" aria-label="Close" class="close" data-target="modal-imprint" onClick="toggleModal(event)">
+      </a>
+      <h3>Impressum</h3>
+      <?php if (file_exists('app_data/imprint.php')) {
+        include('app_data/imprint.php');
+      } ?>
+      <footer>
+        <a href="#cancel" role="button" class="secondary" data-target="modal-imprint" onClick="toggleModal(event)">
+          Schließen
         </a>
       </footer>
     </article>
