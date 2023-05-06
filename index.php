@@ -36,7 +36,7 @@ if (array_key_exists('game', $_POST)) {
 
 if (isset($game_hash)) {  
   global $game_data;
-  $lastLegWinner = $lastLegWinner ? $lastLegWinner : false;
+  $lastLegWinner = isset($lastLegWinner) ? $lastLegWinner : false;
   $game_data = get_game_data($game_hash, $lastLegWinner);
   if ($game_data === 'error') {
     return;

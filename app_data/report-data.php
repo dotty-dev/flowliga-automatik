@@ -140,7 +140,6 @@ function get_game_data($game_hash, $lastLegWinner)
             $rest[$i][$legNumber] -= $score;
           }
 
-          var_dump($lastLegWinner);
           if ($legNumber == 5 && $lastLegWinner != false && $lastLegWinner == $i) {
             // if the last leg was not correctly checked, accept correction
             $finishes[$i][$legNumber] = $rest[$i][$legNumber];
