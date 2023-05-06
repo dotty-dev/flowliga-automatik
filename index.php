@@ -6,7 +6,6 @@ include('app_data/utility-functions.php');
  * ref: https://www.youtube.com/watch?v=3CS-eQdcMLU
  */
 
-
 $cancelled = false;
 
 
@@ -23,8 +22,22 @@ if (array_key_exists('game', $_GET)) {
   includeWithVariables('app_data/report-data.php', array(
     'players_array' => $players_array
   ));
+}
+if (array_key_exists('game', $_POST)) {
+  global $game_hash;
+  global $lastLegWinner; 
+  $game_hash = $_POST["game"];
+  $lastLegWinner = $_POST["last-leg-winner"];
+  includeWithVariables('app_data/report-data.php', array(
+    'players_array' => $players_array
+  ));
+}
+
+
+if (isset($game_hash)) {  
   global $game_data;
-  $game_data = get_game_data($game_hash);
+  $lastLegWinner = $lastLegWinner ? $lastLegWinner : false;
+  $game_data = get_game_data($game_hash, $lastLegWinner);
   if ($game_data === 'error') {
     return;
   }
@@ -66,6 +79,16 @@ if (isset($players)) {
 
   // set $game_number from $game_pairing, for easier access
   $game_number = $game_pairing[0];
+
+  if ($rest[1][5] > 0 && $rest[2][5] > 0) {
+    // var_dump(isset($lastLegWinner));
+    includeWithVariables('app_data/report-error.php', array(
+      'error_reason' => 'lastLegUnfinished',
+      'game_hash' => $game_hash,
+      'players' => $players,
+    ));
+    return;
+  }
 
   // generate and load report image
   ob_start();
@@ -149,7 +172,7 @@ if (isset($players)) {
             <img class="report-img" src="<?php echo $image_base64; ?>" />
           </report-img-area>
         </section>
-        <form method="post">
+        <form method="post" action="./">
           <input type="hidden" name="postResult" value="true">
           <?php if ($cancelled == true) {
             echo "<input type=\"hidden\" name=\"cancelled\" value=\"" . $game_number . "\">";
@@ -167,7 +190,7 @@ if (isset($players)) {
     <?php } ?>
 
     <article>
-      <form>
+      <form action="./">
         <label for="game-link">Lidarts-URL</label>
         <input id="game-link" name="game" type="text" placeholder="https://lidarts.org/game/ABCD1234">
         <div class="grid">

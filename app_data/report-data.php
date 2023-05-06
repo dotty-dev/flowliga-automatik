@@ -19,48 +19,57 @@ function remote_file_exists($url)
 }
 
 // extract game data from lidarts api and store into easier managable parts, return array of said parts
-function get_game_data($game_hash)
+function get_game_data($game_hash, $lastLegWinner)
 {
 
   if (remote_file_exists("https://lidarts.org/api/game/{$game_hash}")) {
     global $json;
-    global $gameData;
+    global $game_data;
     $json = file_get_contents("https://lidarts.org/api/game/{$game_hash}");
     // turn api json to array, "match_json" entry is json saved as string
-    $gameData = json_decode($json, true);
+    $game_data = json_decode($json, true);
     // turn api entry "match_json" from string to associative array
-    $gameData["match_json"] = json_decode($gameData["match_json"], TRUE);
+    $game_data["match_json"] = json_decode($game_data["match_json"], TRUE);
   }
 
-  if ($gameData["bo_legs"] != 9 || $gameData["bo_sets"] != 1) {
+  if (!isset($game_data)) {
+    includeWithVariables('app_data/report-error.php', array(
+      'error_reason' => 'gameNotFound',
+      'game_hash' => $game_hash
+    ));
+   
+    return 'error';
+  }
+
+  if ($game_data["bo_legs"] != 9 || $game_data["bo_sets"] != 1) {
     includeWithVariables('app_data/report-error.php', array(
       'error_reason' => 'wrongMode'
     ));
     return 'error';
   }
 
-  $date = $gameData["begin"];
+  $date = $game_data["begin"];
 
   // associative array of players with statistical entries, 
   // don't start associtative array keys with numbers, it causes trouble 180s -> one80s
   $players = [
     1 => [
-      "name" => $gameData["p1_name"],
-      "one80s" => array_key_exists("p1_180", $gameData) ? $gameData["p1_180"] : 0,
-      "one71s" => array_key_exists("p1_171", $gameData) ? $gameData["p1_171"] : 0,
-      "avg" => number_format($gameData["p1_match_avg"], 2, '.', ''),
+      "name" => $game_data["p1_name"],
+      "one80s" => array_key_exists("p1_180", $game_data) ? $game_data["p1_180"] : 0,
+      "one71s" => array_key_exists("p1_171", $game_data) ? $game_data["p1_171"] : 0,
+      "avg" => number_format($game_data["p1_match_avg"], 2, '.', ''),
       "highestFinish" => 0,
       "winner" => false,
-      "legsWon" => $gameData["p1_legs"]
+      "legsWon" => $game_data["p1_legs"]
     ],
     2 => [
-      "name" => $gameData["p2_name"],
-      "one80s" => array_key_exists("p2_180", $gameData) ? $gameData["p2_180"] : 0,
-      "one71s" => array_key_exists("p2_171", $gameData) ? $gameData["p2_171"] : 0,
-      "avg" => number_format($gameData["p2_match_avg"], 2, '.', ''),
+      "name" => $game_data["p2_name"],
+      "one80s" => array_key_exists("p2_180", $game_data) ? $game_data["p2_180"] : 0,
+      "one71s" => array_key_exists("p2_171", $game_data) ? $game_data["p2_171"] : 0,
+      "avg" => number_format($game_data["p2_match_avg"], 2, '.', ''),
       "highestFinish" => 0,
       "winner" => false,
-      "legsWon" => $gameData["p2_legs"]
+      "legsWon" => $game_data["p2_legs"]
     ]
   ];
 
@@ -112,7 +121,7 @@ function get_game_data($game_hash)
     $correctionRest = $_POST["rest"];
   }
   $legNumber = 0;
-  foreach ($gameData["match_json"][1] as $leg) {
+  foreach ($game_data["match_json"][1] as $leg) {
     $legNumber++;
     if ($legNumber < 6) {
       $i = 0;
@@ -125,17 +134,20 @@ function get_game_data($game_hash)
           if ($players[$i]['highestFinish'] < end($player["scores"])) {
             $players[$i]['highestFinish'] = end($player["scores"]);
           }
-        } else if ($legNumber == 5 && isset($correctionFinishes)) {
-          // if the last leg was not correctly checked, accept correction
-          $rest[$i][$legNumber] = $correctionRest[$i-1];
-          $finishes[$i][$legNumber] = $correctionFinishes[$i-1];
-          if ($players[$i]['highestFinish'] < $correctionFinishes[$i-1]) {
-            $players[$i]['highestFinish'] = $correctionFinishes[$i-1];
-          }
         } else {
           // else substract all thrown scores to get rest points
           foreach ($player["scores"] as $score) {
             $rest[$i][$legNumber] -= $score;
+          }
+
+          var_dump($lastLegWinner);
+          if ($legNumber == 5 && $lastLegWinner != false && $lastLegWinner == $i) {
+            // if the last leg was not correctly checked, accept correction
+            $finishes[$i][$legNumber] = $rest[$i][$legNumber];
+            $rest[$i][$legNumber] = 0;
+            if ($players[$i]['highestFinish'] < $finishes[$i][$legNumber]) {
+              $players[$i]['highestFinish'] = $finishes[$i][$legNumber];
+            }
           }
         }
       }

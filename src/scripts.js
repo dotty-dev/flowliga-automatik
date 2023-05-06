@@ -5,6 +5,16 @@ const submitButtons = document.querySelectorAll('.btn-submit');
 const cancelledGameSelect = document.querySelector('#game-number');
 const postButton = document.querySelector('#post-report');
 
+function backToIndex(event) {
+  const target = event.currentTarget;
+  const gameHash = target.dataset?.faultyHash;
+  if(gameHash) {
+    location.href = `./?faultyHash=${gameHash}`;
+  } else {
+    location.href = "./";
+  }
+}
+
 function loadGame(event) {
   event.preventDefault();
   loadButton.disabled = true;
@@ -24,7 +34,7 @@ function loadGame(event) {
   }
 
   if (isCorrect && gameHash.length === 8) {
-    location.href += `?game=${gameHash}`;
+    location.search = `?game=${gameHash}`;
   } else {
     loadButton.disabled = false;
     gameUrlInput.setAttribute('aria-invalid', 'true');
@@ -63,30 +73,12 @@ function populateCanceledGameOptions() {
   );
 }
 
-loadButton.addEventListener('click', loadGame);
-
-cancelledButton.addEventListener('click', () => {
-  if (gameUrlInput.value.length >= 4 && gameUrlInput.value.length <= 7) {
-    const gamePairingOption = Array.from(cancelledGameSelect.options).filter(
-      (o) => o.value == gameUrlInput.value
-    )[0];
-
-    if (gamePairingOption) {
-      gamePairingOption.selected = true;
-    }
-    cancelledGameSelect.dispatchEvent(new Event('change'));
-  }
-})
-
-cancelledGameSelect.addEventListener('change', populateCanceledGameOptions);
-
-
-function submitFunction (e) {
+function submitFunction(e) {
   const targetForm = e.currentTarget.closest('dialog').querySelector('form');
   targetForm.submit();
-};
+}
 
-function postToDiscord () {
+function postToDiscord() {
   var form = document.createElement('form');
   form.style.display = 'none';
 
@@ -103,4 +95,36 @@ function postToDiscord () {
   form.submit();
 }
 
-postButton.addEventListener('click', postToDiscord);
+loadButton?.addEventListener('click', loadGame);
+
+
+cancelledButton?.addEventListener('click', () => {
+  if (gameUrlInput.value.length >= 4 && gameUrlInput.value.length <= 7) {
+    const gamePairingOption = Array.from(cancelledGameSelect.options).filter(
+      (o) => o.value == gameUrlInput.value
+    )[0];
+
+    if (gamePairingOption) {
+      gamePairingOption.selected = true;
+    }
+    cancelledGameSelect.dispatchEvent(new Event('change'));
+  }
+});
+
+cancelledGameSelect?.addEventListener('change', populateCanceledGameOptions);
+
+postButton?.addEventListener('click', postToDiscord);
+
+// prevent form resubmission with reload or back button
+if (window.history.replaceState) {
+  window.history.replaceState(null, null, window.location.href);
+}
+
+if (location.search.indexOf('faultyHash') > 1 && !document.querySelector('report-img-area')) {
+  let queryString = location.search;
+  queryString = queryString.substring(1);
+  let queryParams = queryString.split('&');
+  queryParams = queryParams.map((i) => (i = i.split('=')));
+  const faultyHash = queryParams.filter((i) => i[0] == 'faultyHash')[0][1];
+  gameUrlInput.value = gameUrlInput.placeholder.replace('ABCD1234', faultyHash);
+}
