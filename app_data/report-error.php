@@ -41,6 +41,27 @@
             case 'lastLegUnfinished':
               $error_text = "Das letzte Leg wurde nicht korrekt beendet, bitte gebe an wer das Leg gewonnen hat.";
               break;
+            case 'noPairing':
+              $error_text = "Es konnte keine Spielpaarung für $player1_name gegen $player2_name gefunden werden. Die Ligaleitung ist informiert und kümmert sich um das Problem.";
+              break;
+            case 'wrongMode':
+              $error_text = "Das angegebene Lidarts Spiel hat den falschen Spielmodus, der Bericht für dieses Spiel muss per Hand erstellt werden.";
+              break;
+            case 'playersNotFoundBoth':
+              $error_text = "Die Lidarts-Accounts $player1_name und $player2_name konnten keinen Ligateilnehmer zugeordnet werden. Die Ligaleitung ist informiert und kümmert sich um das Problem.";
+              break;
+            case 'playerNotFound':
+              $error_text = "Der Lidarts-Account $player1_name konnte keinem Ligateilnehmer zugeorgnet werden. Die Ligaleitung ist informiert und kümmert sich um das Problem.";
+              break;
+            case 'webhookErrors':
+              $error_text = "Beim senden an Discord ist ein Fehler aufgetreten. Die Ligaleitung ist informiert und kümmert sich um das Problem.";
+              break;
+            case 'noPlayersFile':
+              $error_text = "Die Auflösungsdatei für Liganame/Lidartsname/DiscordID konnte nicht geladen werden.";
+              break;
+            case 'noPairingsFile':
+              $error_text = "Die Auflösungsdatei für die Spielpaarungen konnte nicht geladen werden.";
+              break;
             default:
               break;
           }
