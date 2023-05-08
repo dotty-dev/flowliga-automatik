@@ -25,16 +25,16 @@ if (array_key_exists('game', $_GET)) {
 }
 if (array_key_exists('game', $_POST)) {
   global $game_hash;
-  global $lastLegWinner; 
+  global $lastLegWinner;
   $game_hash = $_POST["game"];
-  $lastLegWinner = $_POST["last-leg-winner"];
+  $lastLegWinner = array_key_exists('last-leg-winner', $_POST) ? $_POST["last-leg-winner"] : false;
   includeWithVariables('app_data/report-data.php', array(
     'players_array' => $players_array
   ));
 }
 
 
-if (isset($game_hash)) {  
+if (isset($game_hash)) {
   global $game_data;
   $lastLegWinner = isset($lastLegWinner) ? $lastLegWinner : false;
   $game_data = get_game_data($game_hash, $lastLegWinner);
@@ -118,7 +118,8 @@ if (isset($players)) {
   // post the report to discord if postResult param is found in $_POST
   // if (true) {
   if (array_key_exists('postResult', $_POST)) {
-    includeWithVariables('app_data/report-post.php', array(
+    include('app_data/report-post.php');
+    $report_submitted = post_report(array(
       'image' => $image,
       'game_number' => $game_number,
       'game_hash' => $game_hash,
@@ -130,7 +131,12 @@ if (isset($players)) {
       'player_discord_ids' => $players_discord_ids,
       'cancelled' => $cancelled
     ));
+
+    if ($report_submitted == false) {
+      return;
+    }
   }
+  
 }
 ?>
 

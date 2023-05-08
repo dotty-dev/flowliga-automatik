@@ -62,6 +62,9 @@
             case 'noPairingsFile':
               $error_text = "Die Auflösungsdatei für die Spielpaarungen konnte nicht geladen werden.";
               break;
+              case 'reportAlreadySubmitted':
+                $error_text = "Der Bericht für dieses Spiel wurde bereits übermittelt!";
+                break;
             default:
               break;
           }
