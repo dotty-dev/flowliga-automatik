@@ -21,6 +21,26 @@ function includeWithVariables($filePath, $variables = array(), $print = true)
   return $output;
 }
 
+
+function deleteLineInFile($file, $string)
+{
+  $i = 0;
+  $array = array();
+
+  $read = fopen($file, "r") or die("can't open the file");
+  while (!feof($read)) {
+    $array[$i] = fgets($read);
+    ++$i;
+  }
+  fclose($read);
+
+  $write = fopen($file, "w") or die("can't open the file");
+  foreach ($array as $a) {
+    if (!strstr($a, $string)) fwrite($write, $a);
+  }
+  fclose($write);
+}
+
 /**
  *  Given a file, i.e. /css/base.css, replaces it with a string containing the
  *  file's mtime, i.e. /css/base.1221534296.css.

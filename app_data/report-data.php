@@ -188,19 +188,22 @@ function get_game_data($game_hash, $lastLegWinner)
     return includeWithVariables('app_data/report-error.php', array(
       'player1_name' => $players[1]['name'],
       'player2_name' => $players[2]['name'],
-      'error_reason' => 'playersNotFoundBoth'
+      'error_reason' => 'playersNotFoundBoth',
+      'game_hash' => $game_hash,
     ));
   }
   if ($player_keys[1] == false) {
     return includeWithVariables('app_data/report-error.php', array(
       'player_name' => $players[1]['name'],
-      'error_reason' => 'playerNotFound'
+      'error_reason' => 'playerNotFound',
+      'game_hash' => $game_hash,
     ));
   }
   if ($player_keys[2] == false) {
     return includeWithVariables('app_data/report-error.php', array(
       'player_name' => $players[2]['name'],
-      'error_reason' => 'playerNotFound'
+      'error_reason' => 'playerNotFound',
+      'game_hash' => $game_hash,
     ));
   }
 

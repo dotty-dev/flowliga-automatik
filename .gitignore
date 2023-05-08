@@ -1,5 +1,6 @@
 # results don't need to be checked out
 ergebnisse.csv
+errors.csv
 
 # node module folder and package-lock
 node_modles

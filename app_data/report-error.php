@@ -42,16 +42,22 @@
               $error_text = "Das letzte Leg wurde nicht korrekt beendet, bitte gebe an wer das Leg gewonnen hat.";
               break;
             case 'noPairing':
-              $error_text = "Es konnte keine Spielpaarung für $player1_name gegen $player2_name gefunden werden. Die Ligaleitung ist informiert und kümmert sich um das Problem.";
+              $error_text = "Es konnte keine Spielpaarung für `$player1_name` gegen `$player2_name` gefunden werden.";
+              $error_post_text = "$error_text Lidarts Spiel: https://lidarts.org/game/$game_hash";
+              $error_text = "$error_text Die Ligaleitung ist informiert und kümmert sich um das Problem.";
               break;
             case 'wrongMode':
               $error_text = "Das angegebene Lidarts Spiel hat den falschen Spielmodus, der Bericht für dieses Spiel muss per Hand erstellt werden.";
               break;
             case 'playersNotFoundBoth':
-              $error_text = "Die Lidarts-Accounts $player1_name und $player2_name konnten keinen Ligateilnehmer zugeordnet werden. Die Ligaleitung ist informiert und kümmert sich um das Problem.";
+              $error_text = "Die Lidarts-Accounts `$player1_name` und `$player2_name` konnten keinen Ligateilnehmern zugeordnet werden.";
+              $error_post_text = "$error_text Lidarts Spiel: https://lidarts.org/game/$game_hash";
+              $error_text = "$error_text Die Ligaleitung ist informiert und kümmert sich um das Problem.";
               break;
             case 'playerNotFound':
-              $error_text = "Der Lidarts-Account $player1_name konnte keinem Ligateilnehmer zugeorgnet werden. Die Ligaleitung ist informiert und kümmert sich um das Problem.";
+              $error_text = "Der Lidarts-Account `$player_name` konnte keinem Ligateilnehmer zugeorgnet werden.";
+              $error_post_text = "$error_text Lidarts Spiel: https://lidarts.org/game/$game_hash";
+              $error_text = "$error_text Die Ligaleitung ist informiert und kümmert sich um das Problem.";
               break;
             case 'webhookErrors':
               $error_text = "Beim senden an Discord ist ein Fehler aufgetreten. Die Ligaleitung ist informiert und kümmert sich um das Problem.";
@@ -62,12 +68,50 @@
             case 'noPairingsFile':
               $error_text = "Die Auflösungsdatei für die Spielpaarungen konnte nicht geladen werden.";
               break;
-              case 'reportAlreadySubmitted':
-                $error_text = "Der Bericht für dieses Spiel wurde bereits übermittelt!";
-                break;
+            case 'reportAlreadySubmitted':
+              $error_text = "Der Bericht für dieses Spiel wurde bereits übermittelt!";
+              break;
             default:
               break;
           }
+
+          if (isset($error_post_text)) {
+
+            if (!exec('grep ' . escapeshellarg($error_post_text) . ' ./app_data/errors.csv')) {
+              // setup data for webhook request
+              $json_data = [
+                "tts" => "false",
+                "content" => $error_post_text
+              ];
+
+              // requests with embeds need to be json encoded
+              $json_string = json_encode($json_data, JSON_PRETTY_PRINT);
+
+              ob_start();
+              include('app_data/webhook.php');
+              // seeting up, running and closing curl
+              $curl = curl_init($webhookurl_error);
+              curl_setopt($curl, CURLOPT_TIMEOUT, 10); // 5 seconds
+              curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 10); // 5 seconds
+              curl_setopt($curl, CURLOPT_POST, 1);
+              curl_setopt($curl, CURLOPT_POSTFIELDS, $json_string);
+              curl_setopt($curl, CURLOPT_HTTPHEADER, [
+                "Content-Type: application/json"
+              ]);
+
+              curl_exec($curl);
+
+              curl_close($curl);
+
+              $error_log_file = fopen(
+                "app_data/errors.csv",
+                "a"
+              );
+              fwrite($error_log_file, "\"$game_hash\", \"$error_post_text\"\n");
+              fclose($error_log_file);
+            }
+          }
+
 
           echo $error_text;
           ?>
@@ -79,7 +123,7 @@
           <input type="hidden" name="game" value="<?php echo $game_hash ?>">
           <label for="last-leg-won">Gewinner des letzten Legs</label>
           <select value="0" name="last-leg-winner" id="last-leg-winner">
-            <?php for($i = 1; $i < 3; $i++) {
+            <?php for ($i = 1; $i < 3; $i++) {
               $playerName = $players[$i]['name'];
               echo "<option value=\"$i\">$playerName</option>";
             }

@@ -93,7 +93,7 @@ function post_report($reportData)
   ];
 
   // convert array to string
-  $csv_result = "```" . implode(';', $csv_data_array) . "```";
+  $csv_result = implode(';', $csv_data_array);
 
   if (exec('grep ' . escapeshellarg($csv_result) . ' ./app_data/ergebnisse.csv')) {
     includeWithVariables('app_data/report-error.php', array(
@@ -184,7 +184,7 @@ function post_report($reportData)
   // setup request data to send to webhook
   // request with file is not being encoded as json!
   $request_data = [
-    'content' => $report_post_mention . ' ' . $csv_result . "\n\n",
+    'content' => $report_post_mention . ' ```' . $csv_result . "```\n\n",
     "tts" => "false",
     'file' => new CURLFile($image_temp_filename, 'image/png', $file_name)
   ];
@@ -222,6 +222,9 @@ function post_report($reportData)
     $berichteFile = fopen("app_data/ergebnisse.csv", "a");
     fwrite($berichteFile, $csv_result . "\n");
     fclose($berichteFile);
+
+    deleteLineInFile('app_data/errors.csv', $reportData['game_hash']);
+
   } else {
     includeWithVariables('app_data/report-error.php', array(
       'webhook_errors' => [$response1, $response2],
@@ -229,5 +232,5 @@ function post_report($reportData)
     ));
   }
 
-  return;
+  return true;
 }

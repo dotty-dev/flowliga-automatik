@@ -19,7 +19,7 @@ if (array_key_exists('game', $_GET)) {
   global $game_hash;
   $game_hash = $_GET["game"];
 
-  includeWithVariables('app_data/report-data.php', array(
+  $game_data = includeWithVariables('app_data/report-data.php', array(
     'players_array' => $players_array
   ));
 }
@@ -38,16 +38,17 @@ if (isset($game_hash)) {
   global $game_data;
   $lastLegWinner = isset($lastLegWinner) ? $lastLegWinner : false;
   $game_data = get_game_data($game_hash, $lastLegWinner);
-  if ($game_data === 'error') {
+
+  if (is_array($game_data)) {
+    // set to own variables for easier access
+    $date = $game_data['date'];
+    $players = $game_data['players'];
+    $rest = $game_data['rest'];
+    $finishes = $game_data['finishes'];
+    $players_discord_ids = $game_data['discord_ids'];
+  } else {
     return;
   }
-
-  // set to own variables for easier access
-  $date = $game_data['date'];
-  $players = $game_data['players'];
-  $rest = $game_data['rest'];
-  $finishes = $game_data['finishes'];
-  $players_discord_ids = $game_data['discord_ids'];
 }
 
 if (array_key_exists("cancelled", $_POST)) {
@@ -70,7 +71,8 @@ if (isset($players)) {
     return includeWithVariables('app_data/report-error.php', array(
       'player1_name' => $players[1]['name'],
       'player2_name' => $players[2]['name'],
-      'error_reason' => 'noPairing'
+      'error_reason' => 'noPairing',
+      'game_hash' => $game_hash
     ));
   }
 
@@ -136,7 +138,6 @@ if (isset($players)) {
       return;
     }
   }
-  
 }
 ?>
 
@@ -150,9 +151,9 @@ if (isset($players)) {
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="assets/iosevka.css">
-  <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
   <link rel="stylesheet" href="assets/pico-custom.css">
+  <link rel="stylesheet" href="assets/style.css">
   <title>Flow Liga Spielbericht Automatik</title>
 </head>
 
@@ -175,6 +176,14 @@ if (isset($players)) {
       <article>
         <section>
           <report-img-area>
+            <?php if (isset($report_submitted) && $report_submitted) { ?>
+              <h2>
+                <ins>
+                  Der Spielbericht wurde übermittelt.
+                </ins>
+              </h2>
+              <hr>
+            <?php } ?>
             <img class="report-img" src="<?php echo $image_base64; ?>" />
           </report-img-area>
         </section>
@@ -215,7 +224,7 @@ if (isset($players)) {
         </li>
       </ul>
       <ul>
-        <li><small><a href="https://github.com/be5invis/Iosevka" target="_blank">Iosveka</a> by Belleve Invis</small></li>
+        <li><small><a href="https://github.com/be5invis/Iosevka" target="_blank">Iosevka</a> by Belleve Invis</small></li>
       </ul>
       <ul>
         <li>
