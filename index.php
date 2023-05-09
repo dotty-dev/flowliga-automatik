@@ -196,10 +196,21 @@ if (isset($players)) {
             echo "<input type=\"hidden\" name=\"game\" value=\"" . $game_hash . "\">";
           }
           ?>
-          <div class="grid">
-            <button type="button" id="save-img">💾 Speichern</button>
-            <button type="submit" id="post-report" value="submit">📮 Posten</button>
-          </div>
+          <section>
+            <div class="grid">
+              <a role="button" id="save-img" href="<?php echo $image_base64; ?>" download="<?php
+                                                                                            echo $game_number
+                                                                                              . "_FlowLiga_"
+                                                                                              . $players[1]["name"]
+                                                                                              . "-"
+                                                                                              . $players[2]["name"]
+                                                                                              . ".png"
+                                                                                            ?>">
+                💾 Speichern
+              </a>
+            </div>
+          </section>
+          <button type="submit" id="post-report" value="submit">📮 Posten</button>
         </form>
       </article>
     <?php } ?>
