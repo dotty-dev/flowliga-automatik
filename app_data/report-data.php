@@ -19,7 +19,7 @@ function remote_file_exists($url)
 }
 
 // extract game data from lidarts api and store into easier managable parts, return array of said parts
-function get_game_data($game_hash, $lastLegWinner)
+function get_game_data($game_hash, $last_leg_winner, $loser_rest, $winner_finish)
 {
 
   if (remote_file_exists("https://lidarts.org/api/game/{$game_hash}")) {
@@ -37,7 +37,7 @@ function get_game_data($game_hash, $lastLegWinner)
       'error_reason' => 'gameNotFound',
       'game_hash' => $game_hash
     ));
-   
+
     return 'error';
   }
 
@@ -121,6 +121,12 @@ function get_game_data($game_hash, $lastLegWinner)
     $correctionRest = $_POST["rest"];
   }
   $legNumber = 0;
+  
+  if (count($game_data["match_json"][1]) < 5) {
+    return includeWithVariables('app_data/report-error.php', array(
+      'error_reason' => 'gameNotFinished',
+    ));
+  }
   foreach ($game_data["match_json"][1] as $leg) {
     $legNumber++;
     if ($legNumber < 6) {
@@ -140,12 +146,17 @@ function get_game_data($game_hash, $lastLegWinner)
             $rest[$i][$legNumber] -= $score;
           }
 
-          if ($legNumber == 5 && $lastLegWinner != false && $lastLegWinner == $i) {
+          if ($legNumber == 5 && $last_leg_winner != false) {
             // if the last leg was not correctly checked, accept correction
-            $finishes[$i][$legNumber] = $rest[$i][$legNumber];
-            $rest[$i][$legNumber] = 0;
-            if ($players[$i]['highestFinish'] < $finishes[$i][$legNumber]) {
-              $players[$i]['highestFinish'] = $finishes[$i][$legNumber];
+            if($last_leg_winner == $i) {
+              $finishes[$i][$legNumber] = $winner_finish;
+              $rest[$i][$legNumber] = 0;
+              if ($players[$i]['highestFinish'] < $winner_finish) {
+                $players[$i]['highestFinish'] = $winner_finish;
+              }
+            } else {
+             $finishes[$i][$legNumber] = 0;
+             $rest[$i][$legNumber] = $loser_rest; 
             }
           }
         }

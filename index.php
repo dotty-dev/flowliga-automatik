@@ -25,9 +25,11 @@ if (array_key_exists('game', $_GET)) {
 }
 if (array_key_exists('game', $_POST)) {
   global $game_hash;
-  global $lastLegWinner;
+  global $last_leg_winner;
   $game_hash = $_POST["game"];
-  $lastLegWinner = array_key_exists('last-leg-winner', $_POST) ? $_POST["last-leg-winner"] : false;
+  $last_leg_winner = array_key_exists('last-leg-winner', $_POST) ? $_POST["last-leg-winner"] : false;
+  $loser_rest = array_key_exists('loser-rest', $_POST) ? $_POST["loser-rest"] : false;
+  $winner_finish = array_key_exists('winner-finish', $_POST) ? $_POST["winner-finish"] : false;
   includeWithVariables('app_data/report-data.php', array(
     'players_array' => $players_array
   ));
@@ -36,9 +38,10 @@ if (array_key_exists('game', $_POST)) {
 
 if (isset($game_hash)) {
   global $game_data;
-  $lastLegWinner = isset($lastLegWinner) ? $lastLegWinner : false;
-  $game_data = get_game_data($game_hash, $lastLegWinner);
-
+  global $last_leg_winner;
+  global $loser_rest;
+  global $winner_finish;
+  $game_data = get_game_data($game_hash, $last_leg_winner, $loser_rest, $winner_finish);
   if (is_array($game_data)) {
     // set to own variables for easier access
     $date = $game_data['date'];
@@ -83,7 +86,7 @@ if (isset($players)) {
   $game_number = $game_pairing[0];
 
   if ($rest[1][5] > 0 && $rest[2][5] > 0) {
-    // var_dump(isset($lastLegWinner));
+    // var_dump(isset($last_leg_winner));
     includeWithVariables('app_data/report-error.php', array(
       'error_reason' => 'lastLegUnfinished',
       'game_hash' => $game_hash,
@@ -162,7 +165,7 @@ if (isset($players)) {
     <nav>
       <ul>
         <li>
-          <img src="assets/logo_300_159.png" />
+          <a href="./" target="_self"><img src="assets/logo_300_159.png" /></a>
         </li>
       </ul>
       <ul>
@@ -198,14 +201,10 @@ if (isset($players)) {
           ?>
           <section>
             <div class="grid">
-              <a role="button" id="save-img" href="<?php echo $image_base64; ?>" download="<?php
-                                                                                            echo $game_number
-                                                                                              . "_FlowLiga_"
-                                                                                              . $players[1]["name"]
-                                                                                              . "-"
-                                                                                              . $players[2]["name"]
-                                                                                              . ".png"
-                                                                                            ?>">
+              <a role="button" id="save-img" href="<?php echo $image_base64; ?>" download="
+              <?php
+              echo $game_number . "_FlowLiga_" . $players[1]["name"] . "-" . $players[2]["name"] . ".png"
+              ?>">
                 💾 Speichern
               </a>
             </div>

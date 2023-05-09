@@ -38,6 +38,9 @@
             case 'gameNotFound':
               $error_text = "Es konnte leider kein Spiel unter der angegeben Adresse gefunden werden, bitte überprüfe ob die Adresse korrekt ist.";
               break;
+            case 'gameNotFinished':
+              $error_text = "Das Spiel wurde frühzeitig abgebrochen, es wurden keine 5 Legs gespielt. Der Bericht für dieses Spiel muss per Hand erstellt werden.";
+              break;
             case 'lastLegUnfinished':
               $error_text = "Das letzte Leg wurde nicht korrekt beendet, bitte gebe an wer das Leg gewonnen hat.";
               break;
@@ -122,13 +125,18 @@
         <form method="post" action="./">
           <input type="hidden" name="game" value="<?php echo $game_hash ?>">
           <label for="last-leg-won">Gewinner des letzten Legs</label>
-          <select value="0" name="last-leg-winner" id="last-leg-winner">
+          <select value="0" name="last-leg-winner" id="last-leg-winner" required>
+            <option value="">Bitte auswählen...</option>
             <?php for ($i = 1; $i < 3; $i++) {
               $playerName = $players[$i]['name'];
               echo "<option value=\"$i\">$playerName</option>";
             }
             ?>
           </select>
+          <label for="winner-finish">Finish des Siegers</label>
+          <input type="number" name="winner-finish" id="winner-finsih" placeholder="Finish" min="2" max="170" required />
+          <label for="loser-rest">Restpunkte des Verlierers</label>
+          <input type="number" name="loser-rest" id="loser-rest" placeholder="Restpunkte" min="2" required />
           <button role="button" id="post-correction" name="post-correction" value="true">Korrigieren</button>
         </form>
       <?php } else { ?>
