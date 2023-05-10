@@ -98,7 +98,7 @@ function loadLookupFiles()
    *  0 is Discord name, 1 is Lidarts name, 2 is Discord ID
    *  if you don't have the files create dummy data before trying to run!
    */
-  $players_file = "app_data/Teilnehmer-Liga-Lidarts-DiscordID.csv";
+  $players_file = "app_data/players.csv";
   if (file_exists($players_file)) {
     $players_csv = file_get_contents($players_file);
     $players_array = array_map("str_getcsv", explode("\n", $players_csv));
@@ -119,7 +119,7 @@ function loadLookupFiles()
    * 0 is game number, 1 is first participant, 2 is second participant
    * if you don't have the files create dummy data before trying to run!
    */
-  $pairings_file = "app_data/game-pairings.csv";
+  $pairings_file = "app_data/games.csv";
   if (file_exists($pairings_file)) {
     $games_csv = file_get_contents($pairings_file);
     $games_array = array_map("str_getcsv", explode("\n", $games_csv));

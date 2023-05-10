@@ -185,11 +185,11 @@ function get_game_data($game_hash, $last_leg_winner, $loser_rest, $winner_finish
   for ($i = 1; $i < 3; $i++) {
     global $players_array;
     $player_keys[$i] = array_search(
-      $players[$i]['name'],
-      array_column($players_array, 1)
+      strtolower($players[$i]['name']),
+      array_map('strtolower',array_column($players_array, 1))
     );
     if ($player_keys[$i] != false) {
-      $players[$i]['name'] = $players_array[$player_keys[$i]][0];
+      strtolower($players[$i]['name'] = $players_array[$player_keys[$i]][0]);
       $players_discord_ids[$i] = $players_array[$player_keys[$i]][2];
     }
   }
