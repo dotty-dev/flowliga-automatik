@@ -106,7 +106,7 @@ function loadLookupFiles()
       return flow_array_trim($arrayItem);
     }, $players_array);
   } else {
-    return includeWithVariables('app_data/report-error.php', array(
+    return includeWithVariables('add_data/partials/report-error.php', array(
       'error_reason' => 'noPlayersFile'
     ));
   }
@@ -127,7 +127,7 @@ function loadLookupFiles()
       return flow_array_trim($arrayItem);
     }, $games_array);
   } else {
-    return includeWithVariables('app_data/report-error.php', array(
+    return includeWithVariables('add_data/partials/report-error.php', array(
       'error_reason' => 'noPairingsFile'
     ));
   }
