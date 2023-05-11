@@ -14,14 +14,17 @@ $img = imagecreatefrompng("app_data/report.png");
 $black = imagecolorallocate($img, 0, 0, 0);
 
 // path to font file, ttf or odf
-$font = "app_data/camingocode/CamingoCode-Bold.ttf";
+$font = "app_data/iosevka-extendedbold.ttf";
+// $font = "app_data/camingocode/CamingoCode-Bold.ttf";
 
 // standard font size
-$fontSize = 25;
+$fontSize = 22;
 
 // initial / max player font size
-$player1FontSize = 25;
-$player2FontSize = 25;
+$player1FontSize = 24;
+$player2FontSize = 24;
+
+$avgFontSize = 22;
 
 // adjust player font size to fit longer names into field boundaries
 $player1_size = imagettfbbox($player1FontSize, 0, $font, $players[$player1]["name"]);
@@ -70,7 +73,7 @@ if (strlen($date) === 10) {
 }
 imagettftext(
   $img, // image object imagecreatefrompng()
-  19, // font size
+  18, // font size
   0, // angle
   454, // y pos
   160, // x pos
@@ -82,7 +85,7 @@ imagettftext(
 // lidarts game hash 
 imagettftext(
   $img,
-  20,
+  19,
   0,
   10,
   210,
@@ -334,20 +337,6 @@ imagettftext(
   $players[$player2]['highestFinish']
 );
 
-// player left avg
-$text_size = imagettfbbox($fontSize, 0, $font, $players[$player1]['avg']);
-$text_width = max([$text_size[2], $text_size[4]]) - min([$text_size[0], $text_size[6]]);
-$center_x = CEIL((95 - $text_width) / 2) + 54; // (field width - text-width) / 2 + offset from left
-imagettftext(
-  $img,
-  $fontSize,
-  0,
-  $center_x,
-  742,
-  $black,
-  $font,
-  $players[$player1]['avg']
-);
 
 // rest diff
 $text_size = imagettfbbox($fontSize, 0, $font, $rest['diff']);
@@ -364,10 +353,35 @@ imagettftext(
   $rest['diff']
 );
 
+
+// adjust player font size to fit longer names into field boundaries
+$player1_avg_size = imagettfbbox($avgFontSize, 0, $font, $players[$player1]['avg']);
+$player2_avg_size = imagettfbbox($avgFontSize, 0, $font, $players[$player2]['avg']);
+$player1_avg_width = max([$player1_avg_size[2], $player1_avg_size[2]]) - min([$player1_avg_size[0], $player1_avg_size[6]]);
+$player2_avg_width = max([$player2_avg_size[2], $player2_avg_size[2]]) - min([$player2_avg_size[0], $player2_avg_size[6]]);
+$avg_max_width = 90;
+while ($player1_avg_width > $avg_max_width || $player2_avg_width > $avg_max_width) {
+  $avgFontSize = $player1FontSize - 1;
+  $player1_avg_size = imagettfbbox($avgFontSize, 0, $font, $players[$player1]['avg']);
+  $player1_avg_width = max([$player1_avg_size[2], $player1_avg_size[2]]) - min([$player1_avg_size[0], $player1_avg_size[6]]);
+  $player2_avg_size = imagettfbbox($avgFontSize, 0, $font, $players[$player2]['avg']);
+  $player2_avg_width = max([$player2_avg_size[2], $player2_avg_size[2]]) - min([$player2_avg_size[0], $player2_avg_size[6]]);
+}
+
+// player left avg
+$center_x = CEIL((92 - $player1_avg_width) / 2) + 53; // (field width - text-width) / 2 + offset from left
+imagettftext(
+  $img,
+  $fontSize,
+  0,
+  $center_x,
+  742,
+  $black,
+  $font,
+  $players[$player1]['avg']
+);
 // player right avg
-$text_size = imagettfbbox($fontSize, 0, $font, $players[$player2]['avg']);
-$text_width = max([$text_size[2], $text_size[4]]) - min([$text_size[0], $text_size[6]]);
-$center_x = CEIL((95 - $text_width) / 2) + 450; // (field width - text-width) / 2 + offset from left
+$center_x = CEIL((92 - $player2_avg_width) / 2) + 453; // (field width - text-width) / 2 + offset from left
 imagettftext(
   $img,
   $fontSize,

@@ -239,11 +239,6 @@ if (isset($players)) {
       </ul>
       <ul>
         <li>
-          <small><a href="https://janfromm.de/typefaces/camingocode/" target="_blank">CamingoCode</a> by Jan Fromm</small>
-        </li>
-      </ul>
-      <ul>
-        <li>
           <small><a href="#imprint" data-target="modal-imprint" onClick="toggleModal(event)">Imprint</a></small>
         </li>
       </ul>
