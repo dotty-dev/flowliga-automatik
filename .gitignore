@@ -1,6 +1,6 @@
 # results don't need to be checked out
-ergebnisse.csv
 errors.csv
+results.csv
 
 # node module folder and package-lock
 node_modles
@@ -14,8 +14,8 @@ webhook.php
 
 
 # ignore all directly related real league data and files
-game-pairings.csv
-Teilnehmer-Liga-Lidarts-DiscordID.csv
+games.csv
+players.csv
 
 # live files for packaging release
 app_data_live

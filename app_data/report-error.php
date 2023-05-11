@@ -45,7 +45,7 @@
               $error_text = "Das letzte Leg wurde nicht korrekt beendet, bitte gebe an wer das Leg gewonnen hat.";
               break;
             case 'noPairing':
-              $error_text = "Es konnte keine Spielpaarung für `$player1_name` gegen `$player2_name` gefunden werden.";
+              $error_text = "Es konnte keine Spielpaarung für \"$player1_name\" gegen \"$player2_name\" gefunden werden.";
               $error_post_text = "$error_text Lidarts Spiel: https://lidarts.org/game/$game_hash";
               $error_text = "$error_text Die Ligaleitung ist informiert und kümmert sich um das Problem.";
               break;
@@ -53,12 +53,12 @@
               $error_text = "Das angegebene Lidarts Spiel hat den falschen Spielmodus, der Bericht für dieses Spiel muss per Hand erstellt werden.";
               break;
             case 'playersNotFoundBoth':
-              $error_text = "Die Lidarts-Accounts `$player1_name` und `$player2_name` konnten keinen Ligateilnehmern zugeordnet werden.";
+              $error_text = "Die Lidarts-Accounts \"$player1_name\" und \"$player2_name\" konnten keinen Ligateilnehmern zugeordnet werden.";
               $error_post_text = "$error_text Lidarts Spiel: https://lidarts.org/game/$game_hash";
               $error_text = "$error_text Die Ligaleitung ist informiert und kümmert sich um das Problem.";
               break;
             case 'playerNotFound':
-              $error_text = "Der Lidarts-Account `$player_name` konnte keinem Ligateilnehmer zugeorgnet werden.";
+              $error_text = "Der Lidarts-Account \"$player_name\" konnte keinem Ligateilnehmer zugeorgnet werden.";
               $error_post_text = "$error_text Lidarts Spiel: https://lidarts.org/game/$game_hash";
               $error_text = "$error_text Die Ligaleitung ist informiert und kümmert sich um das Problem.";
               break;
@@ -79,12 +79,27 @@
           }
 
           if (isset($error_post_text)) {
+            $report_error = false;
+            if (file_exists('app_data/errors.csv')) {
+              if (strpos(file_get_contents('./app_data/errors.csv'), $error_post_text) == false) {
+                $report_error = true;
+              }
+            } else {
+              $report_error = true;
+            }
 
-            if (!exec('grep ' . escapeshellarg($error_post_text) . ' ./app_data/errors.csv')) {
+            if ($report_error) {
+              $error_log_file = fopen(
+                "app_data/errors.csv",
+                "a"
+              );
+              fwrite($error_log_file, "\"$game_hash\", \"$error_post_text\"\n");
+              fclose($error_log_file);
+              // if (!exec('grep ' . escapeshellarg($error_post_text) . ' ./app_data/errors.csv')) {
               // setup data for webhook request
               $json_data = [
                 "tts" => "false",
-                "content" => $error_post_text
+                "content" => str_replace('"', '`', $error_post_text)
               ];
 
               // requests with embeds need to be json encoded
@@ -105,13 +120,6 @@
               curl_exec($curl);
 
               curl_close($curl);
-
-              $error_log_file = fopen(
-                "app_data/errors.csv",
-                "a"
-              );
-              fwrite($error_log_file, "\"$game_hash\", \"$error_post_text\"\n");
-              fclose($error_log_file);
             }
           }
 

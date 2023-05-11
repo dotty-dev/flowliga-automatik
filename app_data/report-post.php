@@ -95,7 +95,8 @@ function post_report($reportData)
   // convert array to string
   $csv_result = implode(';', $csv_data_array);
 
-  if (exec('grep ' . escapeshellarg($csv_result) . ' ./app_data/ergebnisse.csv')) {
+
+  if (file_exists('./app_data/results.csv') && strpos(file_get_contents('./app_data/results.csv'), $csv_result) !== false) {
     includeWithVariables('app_data/report-error.php', array(
       'error_reason' => 'reportAlreadySubmitted'
     ));
@@ -219,7 +220,7 @@ function post_report($reportData)
     // TODO: if line with game number already present, delete and overwrite?
     
 
-    $berichteFile = fopen("app_data/ergebnisse.csv", "a");
+    $berichteFile = fopen("app_data/results.csv", "a");
     fwrite($berichteFile, $csv_result . "\n");
     fclose($berichteFile);
 
