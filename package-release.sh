@@ -1,7 +1,7 @@
 rm -r release/*
 
 cp -r app_data/ release/
-cp app_data_live/* release/app_data/
+cp -r app_data_live/* release/app_data/
 cp -r assets/ release/
 cp assets_live/* release/assets/
 cp index.php release/
