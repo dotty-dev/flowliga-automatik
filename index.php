@@ -1,5 +1,5 @@
 <?php
-include('add_data/partials/utility-functions.php');
+include('app_data/partials/utility-functions.php');
 /** 
  * TODO: Implement session storage to be able to accept corrections 
  * and keep them for posting and saving of the report
@@ -20,7 +20,7 @@ if (array_key_exists('game', $_GET)) {
   global $game_hash;
   $game_hash = $_GET["game"];
 
-  $game_data = includeWithVariables('add_data/partials/report-data.php', array(
+  $game_data = includeWithVariables('app_data/partials/report-data.php', array(
     'players_array' => $players_array
   ));
 }
@@ -31,7 +31,7 @@ if (array_key_exists('game', $_POST)) {
   $last_leg_winner = array_key_exists('last-leg-winner', $_POST) ? $_POST["last-leg-winner"] : false;
   $loser_rest = array_key_exists('loser-rest', $_POST) ? $_POST["loser-rest"] : false;
   $winner_finish = array_key_exists('winner-finish', $_POST) ? $_POST["winner-finish"] : false;
-  includeWithVariables('add_data/partials/report-data.php', array(
+  includeWithVariables('app_data/partials/report-data.php', array(
     'players_array' => $players_array
   ));
 }
@@ -56,7 +56,7 @@ if (isset($game_hash)) {
 }
 
 if (array_key_exists("cancelled", $_POST)) {
-  include('add_data/partials/report-cancelled-data.php');
+  include('app_data/partials/report-cancelled-data.php');
 }
 
 if (isset($players)) {
@@ -72,7 +72,7 @@ if (isset($players)) {
 
   // report error if no pairing found
   if ($game_pairing == false) {
-    return includeWithVariables('add_data/partials/report-error.php', array(
+    return includeWithVariables('app_data/partials/report-error.php', array(
       'player1_name' => $players[1]['name'],
       'player2_name' => $players[2]['name'],
       'error_reason' => 'noPairing',
@@ -88,7 +88,7 @@ if (isset($players)) {
 
   if ($rest[1][5] > 0 && $rest[2][5] > 0) {
     // var_dump(isset($last_leg_winner));
-    includeWithVariables('add_data/partials/report-error.php', array(
+    includeWithVariables('app_data/partials/report-error.php', array(
       'error_reason' => 'lastLegUnfinished',
       'game_hash' => $game_hash,
       'players' => $players,
@@ -100,7 +100,7 @@ if (isset($players)) {
   ob_start();
 
   includeWithVariables(
-    'add_data/partials/report-image.php',
+    'app_data/partials/report-image.php',
     array(
       'game_number' => $game_number,
       'game_hash' => $game_hash,
@@ -124,7 +124,7 @@ if (isset($players)) {
   // post the report to discord if postResult param is found in $_POST
   // if (true) {
   if (array_key_exists('postResult', $_POST)) {
-    include('add_data/partials/report-post.php');
+    include('app_data/partials/report-post.php');
     $report_submitted = post_report(array(
       'image' => $image,
       'game_number' => $game_number,
@@ -284,8 +284,8 @@ if (isset($players)) {
       <a href="#close" aria-label="Close" class="close" data-target="modal-imprint" onClick="toggleModal(event)">
       </a>
       <h3>Impressum</h3>
-      <?php if (file_exists('add_data/partials/imprint.php')) {
-        include('add_data/partials/imprint.php');
+      <?php if (file_exists('app_data/partials/imprint.php')) {
+        include('app_data/partials/imprint.php');
       } ?>
       <footer>
         <a href="#cancel" role="button" class="secondary" data-target="modal-imprint" onClick="toggleModal(event)">

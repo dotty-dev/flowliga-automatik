@@ -10,7 +10,7 @@
 
 function post_report($reportData)
 {
-  include("./add_data/partials/webhook.php");
+  include("./app_data/partials/webhook.php");
   $player1 = 1;
   $player2 = 2;
   // switch numbers if switched flag is set
@@ -97,7 +97,7 @@ function post_report($reportData)
 
 
   if (file_exists('./app_data/results.csv') && strpos(file_get_contents('./app_data/results.csv'), $csv_result) !== false) {
-    includeWithVariables('add_data/partials/report-error.php', array(
+    includeWithVariables('app_data/partials/report-error.php', array(
       'error_reason' => 'reportAlreadySubmitted'
     ));
     return false;
@@ -227,7 +227,7 @@ function post_report($reportData)
     deleteLineInFile('app_data/errors.csv', $reportData['game_hash']);
 
   } else {
-    includeWithVariables('add_data/partials/report-error.php', array(
+    includeWithVariables('app_data/partials/report-error.php', array(
       'webhook_errors' => [$response1, $response2],
       'error_reason' => 'webhookErrors'
     ));

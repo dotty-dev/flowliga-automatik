@@ -112,7 +112,7 @@
               $json_string = json_encode($json_data, JSON_PRETTY_PRINT);
 
               ob_start();
-              include('add_data/partials/webhook.php');
+              include('app_data/partials/webhook.php');
               // seeting up, running and closing curl
               $curl = curl_init($webhookurl_error);
               curl_setopt($curl, CURLOPT_TIMEOUT, 10); // 5 seconds
@@ -184,8 +184,8 @@
       <a href="#close" aria-label="Close" class="close" data-target="modal-imprint" onClick="toggleModal(event)">
       </a>
       <h3>Impressum</h3>
-      <?php if (file_exists('add_data/partials/imprint.php')) {
-        include('add_data/partials/imprint.php');
+      <?php if (file_exists('app_data/partials/imprint.php')) {
+        include('app_data/partials/imprint.php');
       } ?>
       <footer>
         <a href="#cancel" role="button" class="secondary" data-target="modal-imprint" onClick="toggleModal(event)">

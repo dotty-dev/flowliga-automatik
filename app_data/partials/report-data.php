@@ -33,7 +33,7 @@ function get_game_data($game_hash, $last_leg_winner, $loser_rest, $winner_finish
   }
 
   if (!isset($game_data)) {
-    includeWithVariables('add_data/partials/report-error.php', array(
+    includeWithVariables('app_data/partials/report-error.php', array(
       'error_reason' => 'gameNotFound',
       'game_hash' => $game_hash
     ));
@@ -42,7 +42,7 @@ function get_game_data($game_hash, $last_leg_winner, $loser_rest, $winner_finish
   }
 
   if ($game_data["bo_legs"] != 9 || $game_data["bo_sets"] != 1) {
-    includeWithVariables('add_data/partials/report-error.php', array(
+    includeWithVariables('app_data/partials/report-error.php', array(
       'error_reason' => 'wrongMode'
     ));
     return 'error';
@@ -123,7 +123,7 @@ function get_game_data($game_hash, $last_leg_winner, $loser_rest, $winner_finish
   $legNumber = 0;
   
   if (count($game_data["match_json"][1]) < 5) {
-    return includeWithVariables('add_data/partials/report-error.php', array(
+    return includeWithVariables('app_data/partials/report-error.php', array(
       'error_reason' => 'gameNotFinished',
     ));
   }
@@ -196,7 +196,7 @@ function get_game_data($game_hash, $last_leg_winner, $loser_rest, $winner_finish
 
   // check if either both or one of the players couldn't be looked up and throw error
   if ($player_keys[1] == false && $player_keys[2] == false) {
-    return includeWithVariables('add_data/partials/report-error.php', array(
+    return includeWithVariables('app_data/partials/report-error.php', array(
       'player1_name' => $players[1]['name'],
       'player2_name' => $players[2]['name'],
       'error_reason' => 'playersNotFoundBoth',
@@ -204,14 +204,14 @@ function get_game_data($game_hash, $last_leg_winner, $loser_rest, $winner_finish
     ));
   }
   if ($player_keys[1] == false) {
-    return includeWithVariables('add_data/partials/report-error.php', array(
+    return includeWithVariables('app_data/partials/report-error.php', array(
       'player_name' => $players[1]['name'],
       'error_reason' => 'playerNotFound',
       'game_hash' => $game_hash,
     ));
   }
   if ($player_keys[2] == false) {
-    return includeWithVariables('add_data/partials/report-error.php', array(
+    return includeWithVariables('app_data/partials/report-error.php', array(
       'player_name' => $players[2]['name'],
       'error_reason' => 'playerNotFound',
       'game_hash' => $game_hash,
