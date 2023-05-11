@@ -67,9 +67,11 @@
               break;
             case 'noPlayersFile':
               $error_text = "Die Auflösungsdatei für Liganame/Lidartsname/DiscordID konnte nicht geladen werden.";
+              $error_post_text = "$error_text (players.csv)";
               break;
             case 'noPairingsFile':
               $error_text = "Die Auflösungsdatei für die Spielpaarungen konnte nicht geladen werden.";
+              $error_post_text = "$error_text (games.csv)";
               break;
             case 'reportAlreadySubmitted':
               $error_text = "Der Bericht für dieses Spiel wurde bereits übermittelt!";
@@ -79,6 +81,9 @@
           }
 
           if (isset($error_post_text)) {
+            if(!isset($game_hash)) {
+              $game_hash = '--------';
+            }
             $report_error = false;
             if (file_exists('app_data/errors.csv')) {
               if (strpos(file_get_contents('./app_data/errors.csv'), $error_post_text) == false) {
@@ -93,7 +98,8 @@
                 "app_data/errors.csv",
                 "a"
               );
-              fwrite($error_log_file, "\"$game_hash\", \"$error_post_text\"\n");
+              $date = date("Y-m-d H:i:s", time());
+              fwrite($error_log_file, "\"$game_hash\", \"$error_post_text\", \"$date\"\n");
               fclose($error_log_file);
               // if (!exec('grep ' . escapeshellarg($error_post_text) . ' ./app_data/errors.csv')) {
               // setup data for webhook request
@@ -177,6 +183,22 @@
       </ul>
     </nav>
   </footer>
+
+  <dialog id="modal-imprint">
+    <article>
+      <a href="#close" aria-label="Close" class="close" data-target="modal-imprint" onClick="toggleModal(event)">
+      </a>
+      <h3>Impressum</h3>
+      <?php if (file_exists('app_data/imprint.php')) {
+        include('app_data/imprint.php');
+      } ?>
+      <footer>
+        <a href="#cancel" role="button" class="secondary" data-target="modal-imprint" onClick="toggleModal(event)">
+          Schließen
+        </a>
+      </footer>
+    </article>
+  </dialog>
 
   <script src="assets/pico-modal.js"></script>
   <script src="assets/scripts.js"></script>
