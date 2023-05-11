@@ -7,9 +7,9 @@ cp assets_live/* release/assets/
 cp index.php release/
 cp .htaccess release/
 
-rm release/app_data/game-pairings.csv
-rm release/app_data/Teilnehmer-Liga-Lidarts-DiscordID.csv
-rm release/app_data/ergebnisse.csv
+rm release/app_data/games.csv
+rm release/app_data/players.csv
+rm release/app_data/results.csv
 rm release/app_data/errors.csv
 rm release/app_data/bericht.svg
 
