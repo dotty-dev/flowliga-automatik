@@ -16,6 +16,4 @@ The original graphics are excluded from this repo since I hold no rights to them
 
 Patters in app_data/patters.txt are placeholders and should be replaced with patters.txt from app_data_live in build script (to be added).
 
-Makes use of [CamingoCode Font ](https://janfromm.de/typefaces/camingocode/) [![License: CC BY-ND 4.0](https://licensebuttons.net/l/by-nd/4.0/80x15.png)](https://creativecommons.org/licenses/by-nd/4.0/) by Jan Fromm for adding text to the Report Image.
-
 Uses [Iosevka](https://github.com/be5invis/Iosevka) [![License: Open Font-1.1](https://img.shields.io/badge/License-OFL_1.1-lightgreen.svg)](https://opensource.org/licenses/OFL-1.1) by Belleve Invis as primary display font.
