@@ -193,11 +193,18 @@ if (isset($players)) {
         </section>
         <form method="post" action="./">
           <input type="hidden" name="postResult" value="true">
-          <?php if ($cancelled == true) {
+          <?php
+          if ($cancelled == true) {
             echo "<input type=\"hidden\" name=\"cancelled\" value=\"" . $game_number . "\">";
             echo "<input type=\"hidden\" name=\"cancelledPoints\" value=\"" . $cancelledPoints . "\">";
           } else if ($cancelled == false) {
             echo "<input type=\"hidden\" name=\"game\" value=\"" . $game_hash . "\">";
+          } 
+          
+          if ($last_leg_winner > 0) {
+            echo "<input type=\"hidden\" name=\"last-leg-winner\" value=\"" . $last_leg_winner . "\">";
+            echo "<input type=\"hidden\" name=\"winner-finish\" value=\"" . $winner_finish . "\">";
+            echo "<input type=\"hidden\" name=\"loser-rest\" value=\"" . $loser_rest . "\">";
           }
           ?>
           <section>
