@@ -73,9 +73,9 @@ if (strlen($date) === 10) {
 }
 imagettftext(
   $img, // image object imagecreatefrompng()
-  18, // font size
+  16, // font size
   0, // angle
-  454, // y pos
+  458, // y pos
   160, // x pos
   $black, // color created with imagecolorallocate()
   $font, // path to font file
@@ -85,9 +85,9 @@ imagettftext(
 // lidarts game hash 
 imagettftext(
   $img,
-  19,
+  18,
   0,
-  10,
+  12,
   210,
   $black,
   $font,
