@@ -78,23 +78,6 @@ function submitFunction(e) {
   targetForm.submit();
 }
 
-function postToDiscord() {
-  var form = document.createElement('form');
-  form.style.display = 'none';
-
-  var element1 = document.createElement('input');
-
-  form.method = 'POST';
-
-  element1.value = true;
-  element1.name = 'postResult';
-  form.appendChild(element1);
-
-  document.body.appendChild(form);
-
-  form.submit();
-}
-
 loadButton?.addEventListener('click', loadGame);
 
 
@@ -112,8 +95,6 @@ cancelledButton?.addEventListener('click', () => {
 });
 
 cancelledGameSelect?.addEventListener('change', populateCanceledGameOptions);
-
-postButton?.addEventListener('click', postToDiscord);
 
 // prevent form resubmission with reload or back button
 if (window.history.replaceState) {

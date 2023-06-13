@@ -80,9 +80,10 @@ cancelledGameSelect === null || cancelledGameSelect === void 0 ? void 0 : cancel
 postButton === null || postButton === void 0 ? void 0 : postButton.addEventListener('click', postToDiscord);
 
 // prevent form resubmission with reload or back button
-if (window.history.replaceState) {
-  window.history.replaceState(null, null, window.location.href);
-}
+// if (window.history.replaceState) {
+//   window.history.replaceState(null, null, window.location.href);
+// }
+
 if (location.search.indexOf('faultyHash') > 1 && !document.querySelector('report-img-area')) {
   var queryString = location.search;
   queryString = queryString.substring(1);
