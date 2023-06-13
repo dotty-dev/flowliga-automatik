@@ -60,7 +60,7 @@ function get_game_data($game_hash, $last_leg_winner, $loser_rest, $winner_finish
       "avg" => number_format($game_data["p1_match_avg"], 2, '.', ''),
       "highestFinish" => 0,
       "winner" => false,
-      "legsWon" => $game_data["p1_legs"]
+      "legsWon" => 0
     ],
     2 => [
       "name" => $game_data["p2_name"],
@@ -69,7 +69,7 @@ function get_game_data($game_hash, $last_leg_winner, $loser_rest, $winner_finish
       "avg" => number_format($game_data["p2_match_avg"], 2, '.', ''),
       "highestFinish" => 0,
       "winner" => false,
-      "legsWon" => $game_data["p2_legs"]
+      "legsWon" => 0
     ]
   ];
 
@@ -117,11 +117,11 @@ function get_game_data($game_hash, $last_leg_winner, $loser_rest, $winner_finish
   // calc rest and get finishes,
   // api structure: each leg has 2 entrys for players with subentries for thrown scores
   if (array_key_exists('correction', $_POST)) {
-    $correctionFinishes = $_POST["finsihes"];
+    $correctionFinishes = $_POST["finishes"];
     $correctionRest = $_POST["rest"];
   }
   $legNumber = 0;
-  
+
   if (count($game_data["match_json"][1]) < 5) {
     return includeWithVariables('app_data/partials/report-error.php', array(
       'error_reason' => 'gameNotFinished',
@@ -133,31 +133,30 @@ function get_game_data($game_hash, $last_leg_winner, $loser_rest, $winner_finish
       $i = 0;
       foreach ($leg as $player) {
         $i++;
-        if (array_key_exists("to_finish", $player)) {
-          // if finish, set last thrown score as finish and set rest to 0, substract 501 from sum
-          $rest[$i][$legNumber] = 0;
-          $finishes[$i][$legNumber] = end($player["scores"]);
-          if ($players[$i]['highestFinish'] < end($player["scores"])) {
-            $players[$i]['highestFinish'] = end($player["scores"]);
-          }
-        } else {
-          // else substract all thrown scores to get rest points
-          foreach ($player["scores"] as $score) {
-            $rest[$i][$legNumber] -= $score;
-          }
-
-          if ($legNumber == 5 && $last_leg_winner != false) {
-            // if the last leg was not correctly checked, accept correction
-            if($last_leg_winner == $i) {
-              $finishes[$i][$legNumber] = $winner_finish;
-              $rest[$i][$legNumber] = 0;
-              if ($players[$i]['highestFinish'] < $winner_finish) {
-                $players[$i]['highestFinish'] = $winner_finish;
-              }
-            } else {
-             $finishes[$i][$legNumber] = 0;
-             $rest[$i][$legNumber] = $loser_rest; 
+        // else substract all thrown scores to get rest points
+        foreach ($player["scores"] as $score) {
+          $rest[$i][$legNumber] -= $score;
+          if ($rest[$i][$legNumber] == 0) {
+            $finishes[$i][$legNumber] = $score;
+            $players[$i]["legsWon"] += 1;
+            if ($players[$i]['highestFinish'] < $score) {
+              $players[$i]['highestFinish'] = $score;
             }
+          }
+        }
+
+        if ($legNumber == 5 && $last_leg_winner != false) {
+          // if the last leg was not correctly checked, accept correction
+          if ($last_leg_winner == $i) {
+            $finishes[$i][$legNumber] = $winner_finish;
+            $players[$i]["legsWon"] += 1;
+            $rest[$i][$legNumber] = 0;
+            if ($players[$i]['highestFinish'] < $winner_finish) {
+              $players[$i]['highestFinish'] = $winner_finish;
+            }
+          } else {
+            $finishes[$i][$legNumber] = 0;
+            $rest[$i][$legNumber] = $loser_rest;
           }
         }
       }
@@ -186,16 +185,16 @@ function get_game_data($game_hash, $last_leg_winner, $loser_rest, $winner_finish
     global $players_array;
     $player_keys[$i] = array_search(
       strtolower($players[$i]['name']),
-      array_map('strtolower',array_column($players_array, 1))
+      array_map('strtolower', array_column($players_array, 1))
     );
-    if ($player_keys[$i] != false) {
-      strtolower($players[$i]['name'] = $players_array[$player_keys[$i]][0]);
+    if ($player_keys[$i] !== false) {
+      $players[$i]['name'] = $players_array[$player_keys[$i]][0];
       $players_discord_ids[$i] = $players_array[$player_keys[$i]][2];
     }
   }
 
   // check if either both or one of the players couldn't be looked up and throw error
-  if ($player_keys[1] == false && $player_keys[2] == false) {
+  if ($player_keys[1] === false && $player_keys[2] === false) {
     return includeWithVariables('app_data/partials/report-error.php', array(
       'player1_name' => $players[1]['name'],
       'player2_name' => $players[2]['name'],
@@ -203,14 +202,14 @@ function get_game_data($game_hash, $last_leg_winner, $loser_rest, $winner_finish
       'game_hash' => $game_hash,
     ));
   }
-  if ($player_keys[1] == false) {
+  if ($player_keys[1] === false) {
     return includeWithVariables('app_data/partials/report-error.php', array(
       'player_name' => $players[1]['name'],
       'error_reason' => 'playerNotFound',
       'game_hash' => $game_hash,
     ));
   }
-  if ($player_keys[2] == false) {
+  if ($player_keys[2] === false) {
     return includeWithVariables('app_data/partials/report-error.php', array(
       'player_name' => $players[2]['name'],
       'error_reason' => 'playerNotFound',
