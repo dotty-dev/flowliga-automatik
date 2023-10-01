@@ -70,9 +70,9 @@ $players_discord_ids = array();
 for ($i = 1; $i < 3; $i++) {
   $player_keys[$i] = array_search(
     $players[$i]['name'],
-    array_column($players_array, 1)
+    array_column($players_array, 0)
   );
-  if ($player_keys[$i] != false) {
+  if ($player_keys[$i] !== false) {
     $players_discord_ids[$i] = $players_array[$player_keys[$i]][2];
   }
 }
