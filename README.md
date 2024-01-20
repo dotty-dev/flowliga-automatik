@@ -2,7 +2,7 @@
 Tool to automatically generate game reports for [FlowLiga Online Darts League](https://www.dartzentrum-augsburg.de/flow-dartsliga) from [lidarts](https://lidarts.org) games api.
 
 
-Webhook for posting to Discord are saved in file app_data/partial/swebhook.php the file should look like this:
+Webhook for posting to Discord are saved in file app_data/partials/webhook.php the file should look like this:
 ``` 
 <?php 
 
