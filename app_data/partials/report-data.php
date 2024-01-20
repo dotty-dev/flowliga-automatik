@@ -134,13 +134,20 @@ function get_game_data($game_hash, $last_leg_winner, $loser_rest, $winner_finish
       foreach ($leg as $player) {
         $i++;
         // else substract all thrown scores to get rest points
-        foreach ($player["scores"] as $score) {
-          $rest[$i][$legNumber] -= $score;
-          if ($rest[$i][$legNumber] == 0) {
-            $finishes[$i][$legNumber] = $score;
+        foreach ($player["scores"] as $key => $score) {
+          // check if lidarts messed up the last score on finished legs and fix based on rest score of previous throw
+          if ($key === array_key_last($player["scores"]) && isset($player["to_finish"]) && ($rest[$i][$legNumber] - $score) > 0) {
+            $finishes[$i][$legNumber] = $rest[$i][$legNumber];
             $players[$i]["legsWon"] += 1;
-            if ($players[$i]['highestFinish'] < $score) {
-              $players[$i]['highestFinish'] = $score;
+            $rest[$i][$legNumber] = 0;
+          } else {
+            $rest[$i][$legNumber] -= $score;
+            if ($rest[$i][$legNumber] == 0) {
+              $finishes[$i][$legNumber] = $score;
+              $players[$i]["legsWon"] += 1;
+              if ($players[$i]['highestFinish'] < $score) {
+                $players[$i]['highestFinish'] = $score;
+              }
             }
           }
         }
