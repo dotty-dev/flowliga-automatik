@@ -136,3 +136,9 @@ function loadLookupFiles()
 
   return ["players_array" => $players_array_trimmed, "games_array" => $games_array_trimmed];
 }
+
+function dump_JSON ($a, $echo = true) {
+  $str =  '<pre>' . htmlentities(json_encode($a, JSON_PRETTY_PRINT)) . '</pre>';
+  if ($echo) echo $str;
+  return $str;
+}
