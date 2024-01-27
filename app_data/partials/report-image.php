@@ -222,7 +222,7 @@ for ($i = 1; $i < 6; $i++) {
     get_leg_y_pos($i),
     $black,
     $font,
-    $finishes[$player1][$i]
+    $finishes[$player1][$i] === 0 ? '-' : $finishes[$player1][$i]
   );
 }
 
@@ -239,7 +239,7 @@ for ($i = 1; $i < 6; $i++) {
     get_leg_y_pos($i),
     $black,
     $font,
-    $rest[$player1][$i]
+    $rest[$player1][$i] === 0 ? '-' : $rest[$player1][$i]
   );
 }
 
@@ -256,7 +256,7 @@ for ($i = 1; $i < 6; $i++) {
     get_leg_y_pos($i),
     $black,
     $font,
-    $rest[$player2][$i]
+    $rest[$player2][$i] === 0 ? '-' : $rest[$player2][$i]
   );
 }
 
@@ -273,7 +273,7 @@ for ($i = 1; $i < 6; $i++) {
     get_leg_y_pos($i),
     $black,
     $font,
-    $finishes[$player2][$i]
+    $finishes[$player2][$i] === 0 ? '-' : $finishes[$player2][$i]
   );
 }
 
