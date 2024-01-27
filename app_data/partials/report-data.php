@@ -130,23 +130,29 @@ function get_game_data($game_hash, $last_leg_winner, $loser_rest, $winner_finish
   foreach ($game_data["match_json"][1] as $leg) {
     $legNumber++;
     if ($legNumber < 6) {
-      $i = 0;
+      $playerIterator = 0;
+      // check if both players have a set to_finish key
+      $toFinishError = false;
+      if (isset ($leg['1']['to_finish']) && isset ($leg['2']['to_finish'])) {
+        $toFinishError = true;
+      }
+      $toFinishErrorString = $toFinishError ? 'true' : 'false';
       foreach ($leg as $player) {
-        $i++;
-        // else substract all thrown scores to get rest points
+        $playerIterator++;
         foreach ($player["scores"] as $key => $score) {
           // check if lidarts messed up the last score on finished legs and fix based on rest score of previous throw
-          if ($key === array_key_last($player["scores"]) && isset($player["to_finish"]) && ($rest[$i][$legNumber] - $score) > 0) {
-            $finishes[$i][$legNumber] = $rest[$i][$legNumber];
-            $players[$i]["legsWon"] += 1;
-            $rest[$i][$legNumber] = 0;
+          if ($key === array_key_last($player["scores"]) && isset($player["to_finish"]) && ($rest[$playerIterator][$legNumber] - $score) > 0 && $toFinishError == false) {
+            $finishes[$playerIterator][$legNumber] = $rest[$playerIterator][$legNumber];
+            $players[$playerIterator]["legsWon"] += 1;
+            $rest[$playerIterator][$legNumber] = 0;
+            // else substract all thrown scores to get rest points
           } else {
-            $rest[$i][$legNumber] -= $score;
-            if ($rest[$i][$legNumber] == 0) {
-              $finishes[$i][$legNumber] = $score;
-              $players[$i]["legsWon"] += 1;
-              if ($players[$i]['highestFinish'] < $score) {
-                $players[$i]['highestFinish'] = $score;
+            $rest[$playerIterator][$legNumber] -= $score;
+            if ($rest[$playerIterator][$legNumber] == 0) {
+              $finishes[$playerIterator][$legNumber] = $score;
+              $players[$playerIterator]["legsWon"] += 1;
+              if ($players[$playerIterator]['highestFinish'] < $score) {
+                $players[$playerIterator]['highestFinish'] = $score;
               }
             }
           }
@@ -154,16 +160,16 @@ function get_game_data($game_hash, $last_leg_winner, $loser_rest, $winner_finish
 
         if ($legNumber == 5 && $last_leg_winner != false) {
           // if the last leg was not correctly checked, accept correction
-          if ($last_leg_winner == $i) {
-            $finishes[$i][$legNumber] = $winner_finish;
-            $players[$i]["legsWon"] += 1;
-            $rest[$i][$legNumber] = 0;
-            if ($players[$i]['highestFinish'] < $winner_finish) {
-              $players[$i]['highestFinish'] = $winner_finish;
+          if ($last_leg_winner == $playerIterator) {
+            $finishes[$playerIterator][$legNumber] = $winner_finish;
+            $players[$playerIterator]["legsWon"] += 1;
+            $rest[$playerIterator][$legNumber] = 0;
+            if ($players[$playerIterator]['highestFinish'] < $winner_finish) {
+              $players[$playerIterator]['highestFinish'] = $winner_finish;
             }
           } else {
-            $finishes[$i][$legNumber] = 0;
-            $rest[$i][$legNumber] = $loser_rest;
+            $finishes[$playerIterator][$legNumber] = 0;
+            $rest[$playerIterator][$legNumber] = $loser_rest;
           }
         }
       }
