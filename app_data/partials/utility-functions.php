@@ -61,9 +61,13 @@ function auto_version($file)
 }
 
 // utility function to remove whitespaces from csv entries
-function flow_array_trim($entry)
+function flow_array_trim($entry, $cutAwayFirstCol = false)
 {
-  return [trim($entry[0]), trim($entry[1]), trim($entry[2])];
+  if ($cutAwayFirstCol) {
+    return [trim($entry[1]), trim($entry[2]), trim($entry[3])];
+  } else {
+    return [trim($entry[0]), trim($entry[1]), trim($entry[2])];
+  }
 };
 
 // search function for game pairing, returns false if non found
@@ -116,7 +120,7 @@ function loadLookupFiles()
 
   /** 
    * load game pairings from file, csv format
-   * 0 is game number, 1 is first participant, 2 is second participant
+   * 0 is game number, 1 is first participant, 2 is second participant (after flow_array_trim)
    * if you don't have the files create dummy data before trying to run!
    */
   $pairings_file = "app_data/games.csv";
@@ -124,7 +128,7 @@ function loadLookupFiles()
     $games_csv = file_get_contents($pairings_file);
     $games_array = array_map("str_getcsv", explode("\n", $games_csv));
     $games_array_trimmed = array_map(function ($arrayItem) {
-      return flow_array_trim($arrayItem);
+      return flow_array_trim($arrayItem, true);
     }, $games_array);
   } else {
     return includeWithVariables('app_data/partials/report-error.php', array(
@@ -134,11 +138,40 @@ function loadLookupFiles()
   // remove csv header entries 
   array_shift($games_array_trimmed);
 
-  return ["players_array" => $players_array_trimmed, "games_array" => $games_array_trimmed];
+  /**
+   * load file with submitted reports for overview generation
+   * 
+   */
+
+  $overview_file = "app_data/overview.csv";
+  if (file_exists($overview_file)) {
+    $overview_csv = file_get_contents($overview_file);
+    $overview_array = array_map(function ($v) {
+      return str_getcsv($v, ";");
+    }, explode("\n", $overview_csv));
+  } else {
+    return includeWithVariables('app_data/partials/report-error.php', array(
+      'error_reason' => 'noOverviewFile'
+    ));
+  }
+
+
+  return ["players_array" => $players_array_trimmed, "games_array" => $games_array_trimmed, "overview_array" => $overview_array];
 }
 
-function dump_JSON ($a, $echo = true) {
+function dump_JSON($a, $echo = true)
+{
   $str =  '<pre>' . htmlentities(json_encode($a, JSON_PRETTY_PRINT)) . '</pre>';
   if ($echo) echo $str;
   return $str;
+}
+
+function lookup_result($needle, $haystack)
+{
+  foreach ($haystack as $element) {
+    if (in_array($needle, $element)) {
+      return $element;
+    }
+  }
+  return "";
 }

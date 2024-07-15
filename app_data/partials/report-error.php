@@ -73,6 +73,9 @@
               $error_text = "Die Auflösungsdatei für die Spielpaarungen konnte nicht geladen werden.";
               $error_post_text = "$error_text (games.csv)";
               break;
+            case 'noOverviewFile':
+              $error_text = "Die Datei für die bereits gespielten Spiele konnte nicht gefunden werden.";
+              $error_post_text = "$error_text (overview.csv)";
             case 'reportAlreadySubmitted':
               $error_text = "Der Bericht für dieses Spiel wurde bereits übermittelt!";
               break;

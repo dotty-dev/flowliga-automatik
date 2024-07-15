@@ -1,4 +1,5 @@
 <?php
+
 include('app_data/partials/utility-functions.php');
 /** 
  * TODO: Implement session storage to be able to accept corrections 
@@ -98,7 +99,6 @@ if (isset($players)) {
 
   // generate and load report image
   ob_start();
-
   includeWithVariables(
     'app_data/partials/report-image.php',
     array(
@@ -111,9 +111,7 @@ if (isset($players)) {
       'rest' => $rest,
     )
   );
-
   $image = ob_get_contents();
-
   ob_end_clean();
 
 

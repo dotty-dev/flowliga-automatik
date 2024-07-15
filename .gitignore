@@ -27,3 +27,5 @@ assets_live/*
 release
 release/*
 
+
+app_data/overview.csv
