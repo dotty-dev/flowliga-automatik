@@ -30,9 +30,9 @@ if (file_exists($groupsize_file)) {
   <link rel="stylesheet" href="assets/style.css">
   <style>
     .submitted td {
-        font-weight: bolder;
-        background: rgb(185, 242, 242);
-      }
+      font-weight: bolder;
+      background: rgb(185, 242, 242);
+    }
 
     @media only screen and (prefers-color-scheme: dark) {
       .submitted td {
@@ -45,7 +45,8 @@ if (file_exists($groupsize_file)) {
       transform: scale(2);
       transform-origin: left;
     }
-/* 
+
+    /* 
     .winner {
       text-decoration: underline;
     } */
@@ -57,12 +58,53 @@ if (file_exists($groupsize_file)) {
     .submitted span.winner {
       color: green;
     }
+
+    .hide {
+      display: none !important;
+    }
   </style>
   <title>Flow Liga Spielbericht Automatik</title>
 </head>
 
 <body>
   <div class="container">
+    <nav>
+      <ul>
+        <li>
+          <a href="./" target="_self"><img src="assets/logo_300_159.png" /></a>
+        </li>
+      </ul>
+      <ul>
+        <li>
+          <hgroup>
+            <h1>Spielbericht Übersicht</h1>
+            <p>für die aktuelle Phase</p>
+          </hgroup>
+        </li>
+      </ul>
+    </nav>
+    <article>
+      <div class="grid">
+        <label>
+          <input type="radio" name="submit-state" class="submit-state-filter" value="-1" checked />
+          Alle
+        </label>
+        <label>
+          <input type="radio" name="submit-state" class="submit-state-filter" value="0" />
+          Offen
+        </label>
+        <label>
+          <input type="radio" name="submit-state" class="submit-state-filter" value="1" />
+          Eingereicht
+        </label>
+      </div>
+    </article>
+    <div class="grid">
+      <input id="filter-player" type="text" name="player" placeholder="Filter Spieler" aria-label="Filter Spieler" />
+      <select id="group-select" name="group" aria-label="Filter Group">
+        <option value="all">Gruppe auswählen</option>
+      </select>
+    </div>
     <div>
       <?php
       $groups_counter = 0;
@@ -70,7 +112,7 @@ if (file_exists($groupsize_file)) {
       for ($i = 0; $i < count($games_array); $i++) {
         if ($games_array[$i][0] !== "") {
           $results = lookup_result($games_array[$i][0], $overview_array);
-          $result_class = $results === "" ? "" : "submitted";
+          $result_class = $results === "" ? "not-submitted" : "submitted";
           $submitted_mark = $results === "" ? "" : "✓";
           $p1_winner = "";
           $p2_winner = "";
@@ -86,12 +128,12 @@ if (file_exists($groupsize_file)) {
               $groupOpen = false;
               printf('</tbody></table></article>');
             }
-            printf("<article><header>Gruppe $groups_counter</header>");
+            printf('<article class="group"><header>Gruppe ' . $groups_counter . '</header>');
             printf('<table style="table-layout: fixed;"><thead><tr><th scope="col" width="150" colspan="2">Spiel-Nr.</th><th scope="col" colspan="2">Spieler</th></tr></thead><tbody>');
             $groupOpen = true;
           }
       ?>
-          <tr class="<?php echo $result_class ?>">
+          <tr class="game <?php echo $result_class ?>">
             <td>
               <div>
                 <?php echo $submitted_mark ?>
@@ -127,6 +169,103 @@ if (file_exists($groupsize_file)) {
       ?>
     </div>
   </div>
+  <script>
+    const playerFilterInput = document.querySelector('#filter-player');
+    const groupSelect = document.querySelector("#group-select");
+    const groupElements = document.querySelectorAll('article.group');
+    const stateFilterElements = document.querySelectorAll('.submit-state-filter');
+
+    function filterPlayer() {
+      groupElements.forEach(el => {
+        let searchTerm = playerFilterInput.value;
+        if (el.textContent.toLowerCase().includes(searchTerm.toLowerCase())) {
+          el.style.display = "block";
+          el.querySelectorAll('tbody tr').forEach(tr => {
+            if (tr.textContent.toLowerCase().includes(searchTerm.toLowerCase())) {
+              tr.style.display = "table-row";
+            } else {
+              tr.style.display = "none";
+            }
+          })
+        } else {
+          el.style.display = "none";
+        }
+      })
+    }
+
+    filterPlayer();
+    playerFilterInput.addEventListener("input", filterPlayer);
+
+    function fillGroupSelect() {
+      groupElements.forEach(el => {
+        const headerText = el.querySelector("header").textContent;
+        groupSelect.insertAdjacentHTML("beforeend", `<option value="${headerText}">${headerText}</option>`)
+      })
+    }
+
+    function filterGroup() {
+      groupElements.forEach(el => {
+        const searchTerm = new RegExp(`^${groupSelect.value}$`);
+        const headerText = el.querySelector("header").textContent;
+        if (headerText.match(searchTerm) || "all".match(searchTerm)) {
+          el.style.display = "block";
+        } else {
+          el.style.display = "none";
+        }
+      })
+    }
+
+    fillGroupSelect();
+    groupSelect.addEventListener("change", filterGroup);
+
+
+    function filterState() {
+      const selectedState = document.querySelector(".submit-state-filter:checked").value;
+
+      switch (selectedState) {
+        case "0":
+          groupElements.forEach(el => {
+            if (el.querySelectorAll(".not-submitted").length > 0) {
+              el.classList.remove("hide");
+              el.querySelectorAll(".game").forEach(game => {
+                if (game.classList.contains("not-submitted")) {
+                  game.classList.remove("hide");
+                } else {
+                  game.classList.add("hide");
+                }
+              })
+            } else {
+              el.classList.add("hide");
+            }
+          })
+          break;
+        case "1":
+          groupElements.forEach(el => {
+            if (el.querySelectorAll(".submitted").length > 0) {
+              el.classList.remove("hide");
+              el.querySelectorAll(".game").forEach(game => {
+                if (game.classList.contains("submitted")) {
+                  game.classList.remove("hide");
+                } else {
+                  game.classList.add("hide");
+                }
+              })
+            } else {
+              el.classList.add("hide");
+            }
+          });
+          break;
+        default:
+          groupElements.forEach(el => {
+            el.classList.remove("hide");
+            el.querySelectorAll(".game").forEach(el => el.classList.remove("hide"));
+          });
+          break;
+      }
+    }
+
+    stateFilterElements.forEach(el => el.addEventListener("change", filterState));
+  </script>
 </body>
 
 </html>
