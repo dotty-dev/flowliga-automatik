@@ -143,20 +143,20 @@ function loadLookupFiles()
    * 
    */
 
-  $overview_file = "app_data/overview.csv";
-  if (file_exists($overview_file)) {
-    $overview_csv = file_get_contents($overview_file);
-    $overview_array = array_map(function ($v) {
+  $results_file = "app_data/results.csv";
+  if (file_exists($results_file)) {
+    $results_csv = file_get_contents($results_file);
+    $results_array = array_map(function ($v) {
       return str_getcsv($v, ";");
-    }, explode("\n", $overview_csv));
+    }, explode("\n", $results_csv));
   } else {
     return includeWithVariables('app_data/partials/report-error.php', array(
-      'error_reason' => 'noOverviewFile'
+      'error_reason' => 'noResultsFile'
     ));
   }
 
 
-  return ["players_array" => $players_array_trimmed, "games_array" => $games_array_trimmed, "overview_array" => $overview_array];
+  return ["players_array" => $players_array_trimmed, "games_array" => $games_array_trimmed, "results_array" => $results_array];
 }
 
 function dump_JSON($a, $echo = true)

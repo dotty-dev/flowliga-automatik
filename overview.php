@@ -9,7 +9,7 @@ include('app_data/partials/utility-functions.php');
 $loaded_lookup_data = loadLookupFiles();
 if (is_array($loaded_lookup_data) == false) return;
 $games_array = $loaded_lookup_data['games_array'];
-$overview_array = $loaded_lookup_data['overview_array'];
+$results_array = $loaded_lookup_data['results_array'];
 $groupsize = 0;
 $groupsize_file = "app_data/groupsize.txt";
 if (file_exists($groupsize_file)) {
@@ -114,7 +114,7 @@ if (file_exists($groupsize_file)) {
       for ($i = 0; $i < count($games_array); $i++) {
         if ($games_array[$i][0] !== "") {
           $open_counter++;
-          $results = lookup_result($games_array[$i][0], $overview_array);
+          $results = lookup_result($games_array[$i][0], $results_array);
           $result_class = $results === "" ? "not-submitted" : "submitted";
           $submitted_mark = $results === "" ? "" : "✓";
           $p1_winner = "";
@@ -170,7 +170,7 @@ if (file_exists($groupsize_file)) {
         }
       }
       printf('</tbody></table>');
-      // print_r($overview_array[0]);
+      // print_r($results_array[0]);
       ?>
     </div>
   </div>

@@ -221,12 +221,8 @@ function post_report($reportData)
     
 
     $berichteFile = fopen("app_data/results.csv", "a");
-    $overviewFile = fopen("app_data/overview.csv", "a");
     fwrite($berichteFile, $csv_result . "\n");
     fclose($berichteFile);
-    fwrite($overviewFile, $csv_result . "\n");
-    fclose($overviewFile);
-
     deleteLineInFile('app_data/errors.csv', $reportData['game_hash']);
 
   } else {

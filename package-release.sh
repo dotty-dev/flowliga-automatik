@@ -5,6 +5,7 @@ cp -r app_data_live/* release/app_data/
 cp -r assets/ release/
 cp assets_live/* release/assets/
 cp index.php release/
+cp overview.php release/
 cp .htaccess release/
 
 rm release/app_data/games.csv
