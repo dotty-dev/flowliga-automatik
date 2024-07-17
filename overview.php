@@ -91,11 +91,11 @@ if (file_exists($groupsize_file)) {
         </label>
         <label>
           <input type="radio" name="submit-state" class="submit-state-filter" value="0" />
-          Offen
+          Offen <span id="open-counter"></span>
         </label>
         <label>
           <input type="radio" name="submit-state" class="submit-state-filter" value="1" />
-          Eingereicht
+          Eingereicht <span id="submitted-counter"></span>
         </label>
       </div>
     </article>
@@ -108,9 +108,12 @@ if (file_exists($groupsize_file)) {
     <div>
       <?php
       $groups_counter = 0;
-      $groupOpen = false;
+      $open_counter = 0;
+      $submitted_counter = 0;
+      $group_open = false;
       for ($i = 0; $i < count($games_array); $i++) {
         if ($games_array[$i][0] !== "") {
+          $open_counter++;
           $results = lookup_result($games_array[$i][0], $overview_array);
           $result_class = $results === "" ? "not-submitted" : "submitted";
           $submitted_mark = $results === "" ? "" : "✓";
@@ -118,19 +121,21 @@ if (file_exists($groupsize_file)) {
           $p2_winner = "";
 
           if ($results !== "") {
+            $submitted_counter++;
+            $open_counter--;
             $p1_winner = $results[3] > 0 ? "winner" : "";
             $p2_winner = $results[4] > 0 ? "winner" : "";
           }
 
           if ($i % (($groupsize * $groupsize - $groupsize) / 2) == 0) {
             $groups_counter++;
-            if ($groupOpen) {
-              $groupOpen = false;
+            if ($group_open) {
+              $group_open = false;
               printf('</tbody></table></article>');
             }
             printf('<article class="group"><header>Gruppe ' . $groups_counter . '</header>');
             printf('<table style="table-layout: fixed;"><thead><tr><th scope="col" width="150" colspan="2">Spiel-Nr.</th><th scope="col" colspan="2">Spieler</th></tr></thead><tbody>');
-            $groupOpen = true;
+            $group_open = true;
           }
       ?>
           <tr class="game <?php echo $result_class ?>">
@@ -174,6 +179,13 @@ if (file_exists($groupsize_file)) {
     const groupSelect = document.querySelector("#group-select");
     const groupElements = document.querySelectorAll('article.group');
     const stateFilterElements = document.querySelectorAll('.submit-state-filter');
+
+
+    const openCounter = <?php echo $open_counter ?>;
+    const submittedCounter = <?php echo $submitted_counter ?>;
+
+    document.querySelector("#open-counter").innerHTML = `(${openCounter})`;
+    document.querySelector("#submitted-counter").innerHTML = `(${submittedCounter})`;
 
     function filterPlayer() {
       groupElements.forEach(el => {
