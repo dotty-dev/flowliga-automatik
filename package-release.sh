@@ -10,6 +10,7 @@ cp .htaccess release/
 rm release/app_data/games.csv
 rm release/app_data/players.csv
 rm release/app_data/results.csv
+rm release/app_data/overview.csv
 rm release/app_data/errors.csv
 rm release/app_data/bericht.svg
 

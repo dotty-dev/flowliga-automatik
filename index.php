@@ -229,6 +229,7 @@ if (isset($players)) {
           <button type="button" id="cancelled-game" data-target="modal-cancelled-game" onClick="toggleModal(event)">Abgesagt</button>
         </div>
       </form>
+      <a href="./overview.php"><button>Übersicht</button></a>
     </article>
   </main>
 

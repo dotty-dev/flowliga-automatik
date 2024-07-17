@@ -209,9 +209,9 @@ if (file_exists($groupsize_file)) {
     playerFilterInput.addEventListener("input", filterPlayer);
 
     function fillGroupSelect() {
-      groupElements.forEach(el => {
+      groupElements.forEach((el, index) => {
         const headerText = el.querySelector("header").textContent;
-        groupSelect.insertAdjacentHTML("beforeend", `<option value="${headerText}">${headerText}</option>`)
+        groupSelect.insertAdjacentHTML("beforeend", `<option value="${headerText}">${index + 1} - ${headerText}</option>`)
       })
     }
 
