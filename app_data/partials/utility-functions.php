@@ -138,26 +138,32 @@ function loadLookupFiles()
   // remove csv header entries 
   array_shift($games_array_trimmed);
 
-  /**
+  return ["players_array" => $players_array_trimmed, "games_array" => $games_array_trimmed];
+}
+
+function loadResultArray()
+{
+   /**
    * load file with submitted reports for overview generation
    * 
    */
 
-  $results_file = "app_data/results.csv";
-  if (file_exists($results_file)) {
-    $results_csv = file_get_contents($results_file);
-    $results_array = array_map(function ($v) {
-      return str_getcsv($v, ";");
-    }, explode("\n", $results_csv));
-  } else {
-    return includeWithVariables('app_data/partials/report-error.php', array(
-      'error_reason' => 'noResultsFile'
-    ));
-  }
+   $results_file = "app_data/results.csv";
+   if (file_exists($results_file)) {
+     $results_csv = file_get_contents($results_file);
+     $results_array = array_map(function ($v) {
+       return str_getcsv($v, ";");
+     }, explode("\n", $results_csv));
+   } else {
+     return includeWithVariables('app_data/partials/report-error.php', array(
+       'error_reason' => 'noResultsFile'
+     ));
+   }
 
+  return $results_array;
 
-  return ["players_array" => $players_array_trimmed, "games_array" => $games_array_trimmed, "results_array" => $results_array];
 }
+
 
 function dump_JSON($a, $echo = true)
 {

@@ -1,19 +1,172 @@
 <?php
 
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
 include('app_data/partials/utility-functions.php');
 
 $loaded_lookup_data = loadLookupFiles();
 if (is_array($loaded_lookup_data) == false) return;
 $games_array = $loaded_lookup_data['games_array'];
-$results_array = $loaded_lookup_data['results_array'];
+$results_array = loadResultArray();
 $groupsize = 0;
 $groupsize_file = "app_data/groupsize.txt";
 if (file_exists($groupsize_file)) {
   $groupsize = fgets(fopen($groupsize_file, 'r'));
+}
+
+$playerStats = [
+  "stats_highest_avg" => 0,
+  "stats_highest_avg_players" => [],
+  "stats_most_points" => 0,
+  "stats_most_points_players" => [],
+  "stats_highest_finish" => 0,
+  "stats_highest_finish_players" => [],
+  "stats_most_t80s" => 0,
+  "stats_most_t80s_players" => [],
+  "stats_most_t71p" => 0,
+  "stats_most_t71p_players" => [],
+  "stats_most_hifi" => 0,
+  "stats_most_hifi_players" => [],
+  "stats_points_sum" => 0,
+  "stats_one_leg_sum" => 0,
+  "stats_whitewash_sum" => 0,
+];
+
+function addValuesToPlayerStats($playerStats, $name, $points, $legs_won, $avg, $t80s, $t71p, $highest_finish, $number_of_hifis)
+{
+  if (!array_key_exists($name, $playerStats)) {
+    $playerStats[$name] = [
+      "points" => 0,
+      "legs_won" => 0,
+      "highest_avg" => 0,
+      "t80s" => 0,
+      "t71p" => 0,
+      "oneleg_wins" => 0,
+      "highest_finish" => 0,
+      "hifis" => 0,
+      "highest_points_won" => 0,
+    ];
+  }
+
+  $oneleg_win = $legs_won == 1 && $points > 0 ? 1 : 0;
+  $whitewash = $legs_won == 5 ? 1 : 0;
+  $playerStats["stats_one_leg_sum"] += $oneleg_win;
+  $playerStats["stats_whitewash_sum"] += $whitewash;
+  $playerStats["stats_points_sum"] += $points;
+
+  $playerStats[$name]["points"] += intval($points);
+  $playerStats[$name]["legs_won"] += intval($legs_won);
+  $playerStats[$name]["t80s"] += intval($t80s);
+  $playerStats[$name]["t71p"] += intval($t71p);
+  $playerStats[$name]["oneleg_wins"] += $oneleg_win;
+  $playerStats[$name]["hifis"] += $number_of_hifis;
+
+  if ($playerStats[$name]["highest_points_won"] < $points) {
+    $playerStats[$name]["highest_points_won"] = $points;
+  }
+
+  if ($playerStats[$name]["highest_avg"] < $avg) {
+    $playerStats[$name]["highest_avg"] = $avg;
+  }
+
+  if ($playerStats[$name]["highest_finish"] < $highest_finish) {
+    $playerStats[$name]["highest_finish"] = $highest_finish;
+  }
+
+  if ($playerStats["stats_highest_avg"] < $avg) {
+    $playerStats["stats_highest_avg"] = $avg;
+    $playerStats["stats_highest_avg_players"] = [$name];
+  } else if ($playerStats["stats_highest_avg"] == $avg) {
+    array_push($playerStats["stats_highest_avg_players"], $name);
+  }
+
+  if ($playerStats["stats_most_points"] < $points) {
+    $playerStats["stats_most_points"] = $points;
+    $playerStats["stats_most_points_players"] = [$name];
+  } else if ($playerStats["stats_most_points"] == $points) {
+    array_push($playerStats["stats_most_points_players"], $name);
+  }
+
+  if ($playerStats["stats_highest_finish"] < $highest_finish) {
+    $playerStats["stats_highest_finish"] = $highest_finish;
+    $playerStats["stats_highest_finish_players"] = [$name];
+  } else if ($playerStats["stats_highest_finish"] == $highest_finish) {
+    array_push($playerStats["stats_highest_finish_players"], $name);
+  }
+
+  if ($playerStats["stats_most_t80s"] < $playerStats[$name]["t80s"]) {
+    $playerStats["stats_most_t80s"] = $playerStats[$name]["t80s"];
+    $playerStats["stats_most_t80s_players"] = [$name];
+  } else if ($playerStats["stats_most_t80s"] == $playerStats[$name]["t80s"]) {
+    if (!in_array($name, $playerStats["stats_most_t80s_players"])) {
+      array_push($playerStats["stats_most_t80s_players"], $name);
+    }
+  }
+
+  if ($playerStats["stats_most_t71p"] < $playerStats[$name]["t71p"]) {
+    $playerStats["stats_most_t71p"] = $playerStats[$name]["t71p"];
+    $playerStats["stats_most_t71p_players"] = [$name];
+  } else if ($playerStats["stats_most_t71p"] == $playerStats[$name]["t71p"]) {
+    if (!in_array($name, $playerStats["stats_most_t71p_players"])) {
+      array_push($playerStats["stats_most_t71p_players"], $name);
+    }
+  }
+
+  if ($playerStats["stats_most_hifi"] < $playerStats[$name]["hifis"]) {
+    $playerStats["stats_most_hifi"] = $playerStats[$name]["hifis"];
+    $playerStats["stats_most_hifi_players"] = [$name];
+  } else if ($playerStats["stats_most_hifi"] == $playerStats[$name]["hifis"]) {
+    if (!in_array($name, $playerStats["stats_most_hifi_players"])) {
+      array_push($playerStats["stats_most_hifi_players"], $name);
+    }
+  }
+
+  return $playerStats;
+}
+
+$countedGames = array();
+foreach ($results_array as $result) {
+  // echo '<pre>' . var_export($result, true) . '</pre>';
+  if ($result[0] != NULL && !in_array($result[0], $countedGames)) {
+    if ($result[7] != 0) {
+      array_push($countedGames, $result[0]);
+    }
+
+    $p1_number_hifi = 0;
+    $p1_highest_finish = 0;
+    for ($i = 13; $i < 18; $i++) {
+      if ($result[$i] >= 100) $p1_number_hifi++;
+      if ($result[$i] > $p1_highest_finish) $p1_highest_finish = $result[$i];
+    }
+
+    $playerStats = addValuesToPlayerStats(
+      $playerStats, //stats array
+      $result[1], // name p1
+      $result[3], // points p1
+      $result[5], // legs won p1
+      $result[7], // avg p1
+      $result[9], // t80s p1
+      $result[11], // t71p p1
+      $p1_highest_finish, // highest finish p1
+      $p1_number_hifi, // number of hifis p1
+    );
+
+    $p2_number_hifi = 0;
+    $p2_highest_finish = 0;
+    for ($i = 18; $i < 23; $i++) {
+      if ($result[$i] >= 100) $p2_number_hifi++;
+      if ($result[$i] > $p2_highest_finish) $p2_highest_finish = $result[$i];
+    }
+    $playerStats = addValuesToPlayerStats(
+      $playerStats, //stats array
+      $result[2], // name p2
+      $result[4], // points p2
+      $result[6], // legs won p2
+      $result[8], // avg p2
+      $result[10], // t80s p2
+      $result[12], // t71p p2
+      $p2_highest_finish, // highest finish p2
+      $p2_number_hifi, // number of hifis p2
+    );
+  }
 }
 
 ?>
@@ -62,6 +215,11 @@ if (file_exists($groupsize_file)) {
     .hide {
       display: none !important;
     }
+
+    #highlights h5 {
+      margin-top: .5rem;
+      margin-bottom: .5rem;
+    }
   </style>
   <title>Flow Liga Spielbericht Automatik</title>
 </head>
@@ -106,11 +264,97 @@ if (file_exists($groupsize_file)) {
       </select>
     </div>
     <div>
+      <details id="highlights">
+        <summary role="button">Highlights</summary>
+        <article>
+          <div class="grid">
+            <div>
+              <h5>Max. AVG <mark><?php echo $playerStats["stats_highest_avg"] ?></mark></h5>
+              <table id="highest-avg">
+                <tbody>
+                  <?php
+                  foreach ($playerStats["stats_highest_avg_players"] as $player) {
+                    echo "<tr><td>" . $player . "</td></tr>";
+                  }
+                  ?>
+                </tbody>
+              </table>
+            </div>
+            <div>
+              <h5>Max. PKT <mark><?php echo $playerStats["stats_most_points"] ?></mark></h5>
+              <table id="highest-score">
+                <tbody>
+                  <?php
+                  foreach ($playerStats["stats_most_points_players"] as $player) {
+                    echo "<tr><td>" . $player . "</td></tr>";
+                  }
+                  ?>
+                </tbody>
+              </table>
+            </div>
+            <div>
+              <h5>Top HiFi <mark><?php echo $playerStats["stats_highest_finish"] ?></mark></h5>
+              <table id="highest-finish">
+                <tbody>
+                  <?php
+                  foreach ($playerStats["stats_highest_finish_players"] as $player) {
+                    echo "<tr><td>" . $player . "</td></tr>";
+                  }
+                  ?>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="grid">
+            <div>
+              <h5>Meiste 180er <mark><?php echo $playerStats["stats_most_t80s"] ?></mark></h5>
+              <table id="table-t80s">
+                <tbody>
+                  <?php
+                  foreach ($playerStats["stats_most_t80s_players"] as $player) {
+                    echo "<tr><td>$player</td></tr>";
+                  }
+                  ?>
+                </tbody>
+              </table>
+            </div>
+            <div>
+              <h5>Meiste 170+ <mark><?php echo $playerStats["stats_most_t71p"] ?></mark></h5>
+              <table id="table-t71p">
+                <tbody>
+                  <?php
+                  foreach ($playerStats["stats_most_t71p_players"] as $player) {
+                    echo "<tr><td>$player</td></tr>";
+                  }
+                  ?>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="grid">
+            <div>
+              <h5>Punkte verteilt <mark><?php echo $playerStats["stats_points_sum"] ?></mark></h5>
+            </div>
+            <div>
+              <h5>1-Leg-Wins <mark><?php echo $playerStats["stats_one_leg_sum"] ?></mark></h5>
+            </div>
+            <div>
+              <h5>Whitewashes <mark><?php echo $playerStats["stats_whitewash_sum"] ?></mark></h5>
+            </div>
+          </div>
+        </article>
+      </details>
       <?php
       $groups_counter = 0;
       $open_counter = 0;
       $submitted_counter = 0;
       $group_open = false;
+      $highest_avg = ["name" => "", "avg" => ""];
+      $highest_score = ["name" => "", "score" => ""];
+      $t_80s = 0;
+      $t_80s_players = array();
+      $t_71p = 0;
+      $t_71p_players = array();
       for ($i = 0; $i < count($games_array); $i++) {
         if ($games_array[$i][0] !== "") {
           $open_counter++;
@@ -123,6 +367,7 @@ if (file_exists($groupsize_file)) {
           if ($results !== "") {
             $submitted_counter++;
             $open_counter--;
+
             $p1_winner = $results[3] > 0 ? "winner" : "";
             $p2_winner = $results[4] > 0 ? "winner" : "";
           }
@@ -183,6 +428,7 @@ if (file_exists($groupsize_file)) {
 
     const openCounter = <?php echo $open_counter ?>;
     const submittedCounter = <?php echo $submitted_counter ?>;
+
 
     document.querySelector("#open-counter").innerHTML = `(${openCounter})`;
     document.querySelector("#submitted-counter").innerHTML = `(${submittedCounter})`;
@@ -278,6 +524,9 @@ if (file_exists($groupsize_file)) {
 
     stateFilterElements.forEach(el => el.addEventListener("change", filterState));
   </script>
+
+  <?php  //echo '<pre>' . var_export($playerStats, true) . '</pre>'; 
+  ?>
 </body>
 
 </html>
