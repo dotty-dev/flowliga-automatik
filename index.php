@@ -1,14 +1,9 @@
 <?php
 
 include('app_data/partials/utility-functions.php');
-/** 
- * TODO: Implement session storage to be able to accept corrections 
- * and keep them for posting and saving of the report
- * ref: https://www.youtube.com/watch?v=3CS-eQdcMLU
- */
 
 $cancelled = false;
-
+$manual_report = null;
 
 $loaded_lookup_data = loadLookupFiles();
 if (is_array($loaded_lookup_data) == false) return;
@@ -36,6 +31,7 @@ if (array_key_exists('game', $_POST)) {
     'players_array' => $players_array
   ));
 }
+
 
 
 if (isset($game_hash)) {
@@ -120,7 +116,6 @@ if (isset($players)) {
 
 
   // post the report to discord if postResult param is found in $_POST
-  // if (true) {
   if (array_key_exists('postResult', $_POST)) {
     include('app_data/partials/report-post.php');
     $report_submitted = post_report(array(
@@ -197,8 +192,8 @@ if (isset($players)) {
             echo "<input type=\"hidden\" name=\"cancelledPoints\" value=\"" . $cancelledPoints . "\">";
           } else if ($cancelled == false) {
             echo "<input type=\"hidden\" name=\"game\" value=\"" . $game_hash . "\">";
-          } 
-          
+          }
+
           if (isset($last_leg_winner) && $last_leg_winner > 0) {
             echo "<input type=\"hidden\" name=\"last-leg-winner\" value=\"" . $last_leg_winner . "\">";
             echo "<input type=\"hidden\" name=\"winner-finish\" value=\"" . $winner_finish . "\">";

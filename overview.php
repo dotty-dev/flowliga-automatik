@@ -1,5 +1,4 @@
 <?php
-
 include('app_data/partials/utility-functions.php');
 
 $loaded_lookup_data = loadLookupFiles();
@@ -181,6 +180,7 @@ foreach ($results_array as $result) {
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
   <link rel="stylesheet" href="assets/pico-custom.css">
   <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheer" href="https://cdn.datatables.net/2.1.0/css/dataTables.dataTables.min.css">
   <style>
     .submitted td {
       font-weight: bolder;
@@ -199,11 +199,6 @@ foreach ($results_array as $result) {
       transform-origin: left;
     }
 
-    /* 
-    .winner {
-      text-decoration: underline;
-    } */
-
     .submitted span {
       color: #bf4e4e;
     }
@@ -220,12 +215,35 @@ foreach ($results_array as $result) {
       margin-top: .5rem;
       margin-bottom: .5rem;
     }
+
+    #players-table span[role=button],
+    #players button:not(.switch-view) {
+      margin: 0;
+      padding: 0;
+      background: none;
+      border: none;
+    }
+
+    a.switch-view {
+      width: 100%;
+    }
+
+    .dt-container .dt-layout-row:first-of-type {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-gap: 1em;
+    }
+
+    .dt-container .dt-layout-row:first-of-type .dt-layout-start .dt-length {
+      display: flex;
+      flex-direction: column-reverse;
+    }
   </style>
   <title>Flow Liga Spielbericht Automatik</title>
 </head>
 
 <body>
-  <div class="container">
+  <div id="games" class="container">
     <nav>
       <ul>
         <li>
@@ -344,6 +362,7 @@ foreach ($results_array as $result) {
           </div>
         </article>
       </details>
+      <button class="switch-view" role="button" onclick="switchView()">Spieler Liste</button>
       <?php
       $groups_counter = 0;
       $open_counter = 0;
@@ -419,7 +438,77 @@ foreach ($results_array as $result) {
       ?>
     </div>
   </div>
+  <div id="players" class="container-fluid hide">
+    <nav>
+      <ul>
+        <li>
+          <a href="./" target="_self"><img src="assets/logo_300_159.png" /></a>
+        </li>
+      </ul>
+      <ul>
+        <li>
+          <hgroup>
+            <h1>Spieler Liste</h1>
+            <p>Werte beziehen sich immer nur auf die aktuelle Phase und nicht auf den Zyklus.</p>
+          </hgroup>
+        </li>
+      </ul>
+    </nav>
+    <button class="switch-view" role="button" onclick="switchView()">Spielbericht Übersicht</button>
+    <article>
+      <a href="#close" aria-label="Close" class="close" data-target="modal-players" onClick="toggleModal(event)">
+      </a>
+      <hgroup>
+        <p></p>
+      </hgroup>
+      <table id="players-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Punkte</th>
+            <th>Bester AVG</th>
+            <th>Legs</th>
+            <th>180er</th>
+            <th>171+</th>
+            <th>1-Leg&nbsp;Win</th>
+            <th>Top Finish</th>
+            <th>High Finishes</th>
+            <th>Höchster Sieg</th>
+          </tr>
+        </thead>
+        <tbody>
+          <?php
+          $stats_counter = 0;
+          foreach ($playerStats as $key => $item) {
+            if ($stats_counter > 14) {
+              echo "
+                  <tr>
+                  <td>$key</td>
+                  <td>" . $item["points"] . "</td>
+                  <td>" . $item["highest_avg"] . "</td>
+                  <td>" . $item["legs_won"] . "</td>
+                  <td>" . $item["t80s"] . "</td>
+                  <td>" . $item["t71p"] . "</td>
+                  <td>" . $item["oneleg_wins"] . "</td>
+                  <td>" . $item["highest_finish"] . "</td>
+                  <td>" . $item["hifis"]  . "</td>
+                  <td>" . $item["highest_points_won"] . "</td>
+                  </tr>";
+            } else {
+              $stats_counter++;
+            }
+          }
+          ?>
+        </tbody>
+      </table>
+    </article>
+  </div>
+  <script src="assets/pico-modal.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdn.datatables.net/2.1.0/js/dataTables.min.js"></script>
   <script>
+    const gamesContainer = document.querySelector('#games');
+    const playersContainer = document.querySelector('#players');
     const playerFilterInput = document.querySelector('#filter-player');
     const groupSelect = document.querySelector("#group-select");
     const groupElements = document.querySelectorAll('article.group');
@@ -522,7 +611,24 @@ foreach ($results_array as $result) {
       }
     }
 
+    function switchView() {
+      console.log("switchy button clickety clicked");
+      gamesContainer.classList.toggle("hide");
+      playersContainer.classList.toggle("hide");
+    }
+
     stateFilterElements.forEach(el => el.addEventListener("change", filterState));
+
+
+    let playersTable = new DataTable("#players-table", {
+      order: [
+        [1, "desc"],
+        [2, "desc"]
+      ],
+      language: {
+        url: 'https://cdn.datatables.net/plug-ins/2.1.0/i18n/de-DE.json',
+      },
+    });
   </script>
 
   <?php  //echo '<pre>' . var_export($playerStats, true) . '</pre>'; 

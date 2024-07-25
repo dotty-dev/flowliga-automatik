@@ -28,4 +28,7 @@ release
 release/*
 
 
-app_data/overview.csv
+*.csv
+*.bak
+
+app_data/flowliga.sqlite
