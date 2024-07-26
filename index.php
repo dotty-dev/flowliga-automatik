@@ -7,6 +7,7 @@ include('app_data/partials/utility-functions.php');
 
 $cancelled = false;
 $manual_report = false;
+$comment = "";
 
 $loaded_lookup_data = loadLookupFiles();
 if (is_array($loaded_lookup_data) == false) return;
@@ -48,6 +49,7 @@ if (array_key_exists('json', $_POST)) {
     $finishes = $game_data['finishes'];
     $players_discord_ids = $game_data['discord_ids'];
     $game_hash = $game_data['game_hash'] . " manuell";
+    $comment = $game_data['comment'];
     $manual_report = true;
   }
 }
@@ -146,7 +148,8 @@ if (isset($players)) {
       'finishes' => $finishes,
       'rest' => $rest,
       'player_discord_ids' => $players_discord_ids,
-      'cancelled' => $cancelled
+      'cancelled' => $cancelled,
+      'comment' => $comment,
     ));
 
     if ($report_submitted == false) {
@@ -219,6 +222,11 @@ if (isset($players)) {
           }
           if (array_key_exists('json', $_POST)) {
             echo "<input type=\"hidden\" name=\"json\" value=\"" . htmlspecialchars($_POST['json']) . "\">";
+          }
+          ?>
+          <?php
+          if (count_chars($comment) > 0) {
+            echo "<div class=\"grid\"><article id=\"manual-comment\" data-theme=\"light\"><h3>Kommentar</h3><div>$comment</div></article></div>";
           }
           ?>
           <section>

@@ -186,6 +186,8 @@ $players_array = $loaded_lookup_data['players_array'];
             </tr>
           </tbody>
         </table>
+        <label for="comment">Kommentar</label>
+        <textarea id="comment" placeholder="Grund für manuellen Bericht, weitere Lidarts-Links wenn nötig"></textarea>
       </fieldset>
       <button id="generate-report">Bericht generieren</button>
     </article>
@@ -214,6 +216,7 @@ $players_array = $loaded_lookup_data['players_array'];
     const playerRightAvg = document.querySelector('#player-right-avg');
     const restDiff = document.querySelector('#rest-diff');
     const winnerElement = document.querySelector('#winner');
+    const comment = document.querySelector('#comment');
     const generateReportButton = document.querySelector('#generate-report');
 
     function setPlayers() {
@@ -350,6 +353,10 @@ $players_array = $loaded_lookup_data['players_array'];
         playerRightAvg.setAttribute('aria-invalid', true);
       }
 
+      if (comment.value.length == 0) {
+        comment.setAttribute('aria-invalid', true);
+      }
+
       if (document.querySelectorAll("[aria-invalid]").length === 0) {
         sendReportData();
       }
@@ -378,6 +385,7 @@ $players_array = $loaded_lookup_data['players_array'];
         "p2_winner": winnerElement.value == playerRightElement.value,
         "p1_legs_won": [...playerLeftFinishes].filter((finish) => finish.value > 0).length,
         "p2_legs_won": [...playerRightFinishes].filter((finish) => finish.value > 0).length,
+        "comment": comment.value,
       }
 
       playerLeftRest.forEach((rest, index) => {

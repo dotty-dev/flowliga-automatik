@@ -185,7 +185,7 @@ function post_report($reportData)
   // setup request data to send to webhook
   // request with file is not being encoded as json!
   $request_data = [
-    'content' => $report_post_mention . ' ```' . $csv_result . "```\n\n",
+    'content' => $report_post_mention . ' ```' . $csv_result . "```\n" . $reportData['comment'] . "\n\n",
     "tts" => "false",
     'file' => new CURLFile($image_temp_filename, 'image/png', $file_name)
   ];
