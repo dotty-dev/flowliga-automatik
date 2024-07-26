@@ -1,4 +1,23 @@
 <?php
+
+// return true or falls if remote url exists
+function remote_file_exists($url)
+{
+  $code = FALSE;
+
+  $options['http'] = array(
+    'method' => "HEAD",
+    'ignore_errors' => 1,
+    'max_redirects' => 0
+  );
+
+  $body = file_get_contents($url, false, stream_context_create($options));
+
+  sscanf($http_response_header[0], 'HTTP/%*d.%*d %d', $code);
+
+  return $code < 400;
+}
+
 function includeWithVariables($filePath, $variables = array(), $print = true)
 {
   $output = NULL;

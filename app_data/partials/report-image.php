@@ -12,6 +12,7 @@ $img = imagecreatefrompng("app_data/report.png");
 
 // color to use for text
 $black = imagecolorallocate($img, 0, 0, 0);
+$red = imagecolorallocate($img, 255, 0, 0);
 
 // path to font file, ttf or odf
 $font = "app_data/iosevka-extendedbold.ttf";
@@ -89,9 +90,9 @@ imagettftext(
   0,
   12,
   210,
-  $black,
+  count_chars($game_hash) > 8 ? $red : $black,
   $font,
-  $game_hash
+  substr($game_hash,0,8)
 );
 
 // winner mark [X]

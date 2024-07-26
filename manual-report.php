@@ -58,15 +58,23 @@ $players_array = $loaded_lookup_data['players_array'];
     <article>
 
       <fieldset>
-        <label for="game-number">Spielnummer</label>
-        <select id="game-number" type="test" placeholder="12345" name="cancelled" required>
-          <option selected disabled value></option>
-          <?php
-          foreach ($games_array as $pairing) {
-            echo "<option value=\"" . $pairing[0] . "\" data-player-left=\"" . $pairing[1] . "\" data-player-right=\"" . $pairing[2] . "\">" . $pairing[0] . ": " . $pairing[1] . " <-> " . $pairing[2] . "</option>";
-          }
-          ?>
-        </select>
+        <div class="grid">
+          <div>
+            <label for="game-number">Spielnummer</label>
+            <select id="game-number" type="test" placeholder="12345" name="cancelled" required>
+              <option selected disabled value></option>
+              <?php
+              foreach ($games_array as $pairing) {
+                echo "<option value=\"" . $pairing[0] . "\" data-player-left=\"" . $pairing[1] . "\" data-player-right=\"" . $pairing[2] . "\">" . $pairing[0] . ": " . $pairing[1] . " <-> " . $pairing[2] . "</option>";
+              }
+              ?>
+            </select>
+          </div>
+          <div>
+            <label for="lidarts-link">Lidarts-URL</label>
+            <input type="text" id="lidarts-url">
+          </div>
+        </div>
 
         <table>
           <tbody>
@@ -79,6 +87,20 @@ $players_array = $loaded_lookup_data['players_array'];
               <td colspan="2"><input id="player-left" class="bold" type="text" disabled></td>
               <td><input id="match-date" type="date"></td>
               <td colspan="2"><input id="player-right" class="bold" type="text" disabled></td>
+            </tr>
+            <tr>
+              <td>180er</td>
+              <td>171+</td>
+              <td></td>
+              <td>180er</td>
+              <td>171+</td>
+            </tr>
+            <tr>
+              <td><input id="player-left-180" type="number"></td>
+              <td><input id="player-left-171" type="number"></td>
+              <td></td>
+              <td><input id="player-right-180" type="number"></td>
+              <td><input id="player-right-171" type="number"></td>
             </tr>
             <tr>
               <td>Finish</td>
@@ -172,8 +194,13 @@ $players_array = $loaded_lookup_data['players_array'];
   <script type="text/javascript">
     const reportInputs = [...document.querySelector("fieldset").elements];
     const gameSelector = document.querySelector('#game-number');
+    const lidartsUrl = document.querySelector('#lidarts-url');
     const playerLeftElement = document.querySelector('#player-left');
     const playerRightElement = document.querySelector('#player-right');
+    const playerLeft180 = document.querySelector('#player-left-180');
+    const playerRight180 = document.querySelector('#player-right-180');
+    const playerLeft171 = document.querySelector('#player-left-171');
+    const playerRight171 = document.querySelector('#player-right-171');
     const matchDateElement = document.querySelector('#match-date');
     const playerLeftFinishes = document.querySelectorAll('[data-player="left"].finish');
     const playerRightFinishes = document.querySelectorAll('[data-player="right"].finish');
@@ -195,6 +222,7 @@ $players_array = $loaded_lookup_data['players_array'];
       const playerRight = selectedOption.dataset.playerRight;
       playerLeftElement.value = playerLeft;
       playerRightElement.value = playerRight;
+      gameSelector.removeAttribute('aria-invalid');
     }
 
     function updateResults(event) {
@@ -231,40 +259,33 @@ $players_array = $loaded_lookup_data['players_array'];
       const leftRest = legInputs.filter((el) => el.dataset.player == "left" && el.classList.contains("rest"))[0];
       const rightRest = legInputs.filter((el) => el.dataset.player == "right" && el.classList.contains("rest"))[0];
       legInputs.forEach((el) => el.removeAttribute("aria-invalid"));
-      generateReportButton.disabled = false;
 
       if (leftFinish.value > 170) {
         leftFinish.setAttribute("aria-invalid", true);
-        generateReportButton.disabled = true;
       }
 
       if (rightFinish.value > 170) {
         rightFinish.setAttribute("aria-invalid", true);
-        generateReportButton.disabled = true;
       }
 
       if (leftFinish.value > 0 && rightFinish.value > 0 || leftFinish.value == 0 && rightFinish.value == 0) {
         leftFinish.setAttribute("aria-invalid", true);
         rightFinish.setAttribute("aria-invalid", true);
-        generateReportButton.disabled = true;
       }
 
       if (leftFinish.value > 0 && leftRest.value > 0 || leftFinish.value == 0 && leftRest.value == 0) {
         leftFinish.setAttribute("aria-invalid", true);
         leftRest.setAttribute("aria-invalid", true);
-        generateReportButton.disabled = true;
       }
 
       if (rightFinish.value > 0 && rightRest.value > 0 || rightFinish.value == 0 && rightRest.value == 0) {
         rightFinish.setAttribute("aria-invalid", true);
         rightRest.setAttribute("aria-invalid", true);
-        generateReportButton.disabled = true;
       }
 
       if (leftRest.value > 0 && rightRest.value > 0 || leftRest.value == 0 && rightRest.value == 0) {
         leftRest.setAttribute("aria-invalid", true);
         rightRest.setAttribute("aria-invalid", true);
-        generateReportButton.disabled = true;
       }
 
       updateResults(event);
@@ -296,6 +317,10 @@ $players_array = $loaded_lookup_data['players_array'];
         gameSelector.setAttribute("aria-invalid", true);
       }
 
+      if (lidartsUrl.value.length === 0) {
+        lidartsUrl.setAttribute("aria-invalid", true);
+      }
+
       if (matchDateElement.value === "") {
         matchDateElement.setAttribute("aria-invalid", true);
       }
@@ -316,6 +341,77 @@ $players_array = $loaded_lookup_data['players_array'];
         playerRightAvg.setAttribute("aria-invalid", true);
       }
 
+      const avgRegExp = /^\d{1,2}(,\d{1,2})?$/;
+      if (!avgRegExp.test(playerLeftAvg.value)) {
+        playerLeftAvg.setAttribute('aria-invalid', true);
+      }
+
+      if (!avgRegExp.test(playerRightAvg.value)) {
+        playerRightAvg.setAttribute('aria-invalid', true);
+      }
+
+      if (document.querySelectorAll("[aria-invalid]").length === 0) {
+        sendReportData();
+      }
+
+    }
+
+    function sendReportData() {
+
+      reportJson = {
+        "game_hash": lidartsUrl.value.split("/").at(this.length - 1),
+        "date": matchDateElement.value,
+        "p1_name": playerLeftElement.value,
+        "p2_name": playerRightElement.value,
+        "p1_180": playerLeft180.value == "" ? "0" : playerLeft180.value,
+        "p2_180": playerRight180.value == "" ? "0" : playerRight180.value,
+        "p1_171": playerLeft171.value == "" ? "0" : playerLeft171.value,
+        "p2_171": playerRight171.value == "" ? "0" : playerRight171.value,
+        "p1_match_avg": playerLeftAvg.value.replace(',','.'),
+        "p2_match_avg": playerRightAvg.value.replace(',','.'),
+        "p1_highest_finish": playerLeftHighestFinish.value,
+        "p2_highest_finish": playerRightHighestFinish.value,
+        "p1_rest_sum": playerLeftRestSum.value,
+        "p2_rest_sum": playerRightRestSum.value,
+        "rest_diff": restDiff.value,
+        "p1_winner": winnerElement.value == playerLeftElement.value,
+        "p2_winner": winnerElement.value == playerRightElement.value,
+        "p1_legs_won": [...playerLeftFinishes].filter((finish) => finish.value > 0).length,
+        "p2_legs_won": [...playerRightFinishes].filter((finish) => finish.value > 0).length,
+      }
+
+      playerLeftRest.forEach((rest, index) => {
+        reportJson[`p1_rest_${index+1}`] = rest.value;
+      });
+
+      playerRightRest.forEach((rest, index) => {
+        reportJson[`p2_rest_${index+1}`] = rest.value;
+      });
+
+      playerLeftFinishes.forEach((finish, index) => {
+        reportJson[`p1_finish_${index+1}`] = finish.value;
+      });
+
+      playerRightFinishes.forEach((finish, index) => {
+        reportJson[`p2_finish_${index+1}`] = finish.value;
+      });
+
+      const submitData = JSON.stringify(reportJson);
+      const form = document.createElement('form');
+      form.enctype = 'application/json';
+      form.action = "./";
+      form.method = "POST";
+
+      const input = document.createElement('input');
+      input.type = "hidden";
+      input.value = submitData;
+      input.name = "json";
+
+      form.appendChild(input);
+
+      document.body.appendChild(form);
+
+      form.submit();
     }
 
     playerLeftRest.forEach(el => el.addEventListener("change", legInputValidation));
@@ -324,6 +420,7 @@ $players_array = $loaded_lookup_data['players_array'];
     playerRightFinishes.forEach(el => el.addEventListener("change", legInputValidation));
 
     gameSelector.addEventListener("change", setPlayers);
+    matchDateElement.addEventListener("change", () => matchDateElement.removeAttribute("aria-invalid"));
     generateReportButton.addEventListener("click", validateReport);
   </script>
 

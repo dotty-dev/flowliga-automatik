@@ -1,9 +1,12 @@
 <?php
+// ini_set('display_errors', '1');
+// ini_set('display_startup_errors', '1');
+// error_reporting(E_ALL);
 
 include('app_data/partials/utility-functions.php');
 
 $cancelled = false;
-$manual_report = null;
+$manual_report = false;
 
 $loaded_lookup_data = loadLookupFiles();
 if (is_array($loaded_lookup_data) == false) return;
@@ -20,6 +23,7 @@ if (array_key_exists('game', $_GET)) {
     'players_array' => $players_array
   ));
 }
+
 if (array_key_exists('game', $_POST)) {
   global $game_hash;
   global $last_leg_winner;
@@ -32,9 +36,23 @@ if (array_key_exists('game', $_POST)) {
   ));
 }
 
+if (array_key_exists('json', $_POST)) {
+  global $game_data;
+  // echo("<pre>" . print_r(json_decode($_POST['json'],true), true) . "</pre>");
+  include('app_data/partials/report-data-manual.php');
+  $game_data = get_game_data_manual(json_decode($_POST['json'], true));
+  if (is_array($game_data)) {
+    $date = $game_data['date'];
+    $players = $game_data['players'];
+    $rest = $game_data['rest'];
+    $finishes = $game_data['finishes'];
+    $players_discord_ids = $game_data['discord_ids'];
+    $game_hash = $game_data['game_hash'] . " manuell";
+    $manual_report = true;
+  }
+}
 
-
-if (isset($game_hash)) {
+if (isset($game_hash) && $manual_report === false) {
   global $game_data;
   global $last_leg_winner;
   global $loser_rest;
@@ -199,6 +217,9 @@ if (isset($players)) {
             echo "<input type=\"hidden\" name=\"winner-finish\" value=\"" . $winner_finish . "\">";
             echo "<input type=\"hidden\" name=\"loser-rest\" value=\"" . $loser_rest . "\">";
           }
+          if (array_key_exists('json', $_POST)) {
+            echo "<input type=\"hidden\" name=\"json\" value=\"" . htmlspecialchars($_POST['json']) . "\">";
+          }
           ?>
           <section>
             <div class="grid">
@@ -221,6 +242,9 @@ if (isset($players)) {
         <input id="game-link" name="game" type="text" placeholder="https://lidarts.org/game/ABCD1234">
         <div class="grid">
           <button type="button" id="get-game">Laden</button>
+          <div>
+            <a href="./manual-report.php" id="manual-report" role="button">Manuell</a>
+          </div>
           <button type="button" id="cancelled-game" data-target="modal-cancelled-game" onClick="toggleModal(event)">Abgesagt</button>
         </div>
       </form>
