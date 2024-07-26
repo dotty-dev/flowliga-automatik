@@ -260,11 +260,11 @@ $players_array = $loaded_lookup_data['players_array'];
       const rightRest = legInputs.filter((el) => el.dataset.player == "right" && el.classList.contains("rest"))[0];
       legInputs.forEach((el) => el.removeAttribute("aria-invalid"));
 
-      if (leftFinish.value > 170) {
+      if (leftFinish.value > 170 || leftFinish.value == 1) {
         leftFinish.setAttribute("aria-invalid", true);
       }
 
-      if (rightFinish.value > 170) {
+      if (rightFinish.value > 170 || rightFinish.value == 1) {
         rightFinish.setAttribute("aria-invalid", true);
       }
 
