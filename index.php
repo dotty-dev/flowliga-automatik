@@ -225,7 +225,7 @@ if (isset($players)) {
           }
           ?>
           <?php
-          if (count_chars($comment) > 0) {
+          if (strlen($comment) > 0) {
             echo "<div class=\"grid\"><article id=\"manual-comment\" data-theme=\"light\"><h3>Kommentar</h3><div>$comment</div></article></div>";
           }
           ?>
