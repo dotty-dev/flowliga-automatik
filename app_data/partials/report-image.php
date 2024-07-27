@@ -83,6 +83,7 @@ imagettftext(
   $dateShort // text to add
 );
 
+
 // lidarts game hash 
 imagettftext(
   $img,
@@ -90,7 +91,7 @@ imagettftext(
   0,
   12,
   210,
-  count_chars($game_hash) > 8 ? $red : $black,
+  strlen($game_hash) > 8 ? $red : $black,
   $font,
   substr($game_hash,0,8)
 );
