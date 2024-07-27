@@ -238,6 +238,14 @@ foreach ($results_array as $result) {
       display: flex;
       flex-direction: column-reverse;
     }
+
+    .justify-center {
+      justify-self: center;
+    }
+
+    .justify-end {
+      justify-self: end;
+    }
   </style>
   <title>Flow Liga Spielbericht Automatik</title>
 </head>
@@ -265,11 +273,11 @@ foreach ($results_array as $result) {
           <input type="radio" name="submit-state" class="submit-state-filter" value="-1" checked />
           Alle
         </label>
-        <label>
+        <label class="justify-center">
           <input type="radio" name="submit-state" class="submit-state-filter" value="0" />
           Offen <span id="open-counter"></span>
         </label>
-        <label>
+        <label class="justify-end">
           <input type="radio" name="submit-state" class="submit-state-filter" value="1" />
           Eingereicht <span id="submitted-counter"></span>
         </label>

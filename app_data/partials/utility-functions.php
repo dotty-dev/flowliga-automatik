@@ -149,6 +149,11 @@ function loadLookupFiles()
     $games_array_trimmed = array_map(function ($arrayItem) {
       return flow_array_trim($arrayItem, true);
     }, $games_array);
+    foreach ($games_array_trimmed as $key => $game) {
+      if (strlen($game[1]) == 0 && strlen($game[2]) == 0) {
+        unset($games_array_trimmed[$key]);
+      }
+    }
   } else {
     return includeWithVariables('app_data/partials/report-error.php', array(
       'error_reason' => 'noPairingsFile'
@@ -162,25 +167,24 @@ function loadLookupFiles()
 
 function loadResultArray()
 {
-   /**
+  /**
    * load file with submitted reports for overview generation
    * 
    */
 
-   $results_file = "app_data/results.csv";
-   if (file_exists($results_file)) {
-     $results_csv = file_get_contents($results_file);
-     $results_array = array_map(function ($v) {
-       return str_getcsv($v, ";");
-     }, explode("\n", $results_csv));
-   } else {
-     return includeWithVariables('app_data/partials/report-error.php', array(
-       'error_reason' => 'noResultsFile'
-     ));
-   }
+  $results_file = "app_data/results.csv";
+  if (file_exists($results_file)) {
+    $results_csv = file_get_contents($results_file);
+    $results_array = array_map(function ($v) {
+      return str_getcsv($v, ";");
+    }, explode("\n", $results_csv));
+  } else {
+    return includeWithVariables('app_data/partials/report-error.php', array(
+      'error_reason' => 'noResultsFile'
+    ));
+  }
 
   return $results_array;
-
 }
 
 
