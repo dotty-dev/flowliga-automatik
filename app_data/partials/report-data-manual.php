@@ -68,36 +68,11 @@ function get_game_data_manual($game_data_manual)
     global $players_array;
     $player_keys[$i] = array_search(
       strtolower($players[$i]['name']),
-      array_map('strtolower', array_column($players_array, 1))
+      array_map('strtolower', array_column($players_array, 0))
     );
     if ($player_keys[$i] !== false) {
-      $players[$i]['name'] = $players_array[$player_keys[$i]][0];
       $players_discord_ids[$i] = $players_array[$player_keys[$i]][2];
     }
-  }
-
-  // check if either both or one of the players couldn't be looked up and throw error
-  if ($player_keys[1] === false && $player_keys[2] === false) {
-    return includeWithVariables('app_data/partials/report-error.php', array(
-      'player1_name' => $players[1]['name'],
-      'player2_name' => $players[2]['name'],
-      'error_reason' => 'playersNotFoundBoth',
-      'game_hash' => $game_data_manual["game_hash"]
-    ));
-  }
-  if ($player_keys[1] === false) {
-    return includeWithVariables('app_data/partials/report-error.php', array(
-      'player_name' => $players[1]['name'],
-      'error_reason' => 'playerNotFound',
-      'game_hash' => $game_data_manual["game_hash"],
-    ));
-  }
-  if ($player_keys[2] === false) {
-    return includeWithVariables('app_data/partials/report-error.php', array(
-      'player_name' => $players[2]['name'],
-      'error_reason' => 'playerNotFound',
-      'game_hash' => $game_data_manual["game_hash"]
-    ));
   }
 
   return [
