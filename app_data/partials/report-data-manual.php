@@ -55,11 +55,11 @@ function get_game_data_manual($game_data_manual)
       5 => $game_data_manual["p1_finish_5"]
     ],
     2 => [
-      1 => $game_data_manual["p1_finish_1"],
-      2 => $game_data_manual["p1_finish_2"],
-      3 => $game_data_manual["p1_finish_3"],
-      4 => $game_data_manual["p1_finish_4"],
-      5 => $game_data_manual["p1_finish_5"]
+      1 => $game_data_manual["p2_finish_1"],
+      2 => $game_data_manual["p2_finish_2"],
+      3 => $game_data_manual["p2_finish_3"],
+      4 => $game_data_manual["p2_finish_4"],
+      5 => $game_data_manual["p2_finish_5"]
     ]
   ];
 

@@ -230,7 +230,7 @@ $players_array = $loaded_lookup_data['players_array'];
 
     function updateResults(event) {
       const targetType = `${event.target.dataset.player}-${event.target.classList[0]}`;
-      const finishes = [];
+      const finishes = [0];
       let restSum = 0;
 
       switch (targetType) {
@@ -388,20 +388,20 @@ $players_array = $loaded_lookup_data['players_array'];
         "comment": comment.value,
       }
 
-      playerLeftRest.forEach((rest, index) => {
-        reportJson[`p1_rest_${index+1}`] = rest.value;
+      playerLeftRest.forEach((rest) => {
+        reportJson[`p1_rest_${rest.dataset.leg}`] = rest.value;
       });
 
-      playerRightRest.forEach((rest, index) => {
-        reportJson[`p2_rest_${index+1}`] = rest.value;
+      playerRightRest.forEach((rest) => {
+        reportJson[`p2_rest_${rest.dataset.leg}`] = rest.value;
       });
 
-      playerLeftFinishes.forEach((finish, index) => {
-        reportJson[`p1_finish_${index+1}`] = finish.value;
+      playerLeftFinishes.forEach((finish) => {
+        reportJson[`p1_finish_${finish.dataset.leg}`] = finish.value;
       });
 
-      playerRightFinishes.forEach((finish, index) => {
-        reportJson[`p2_finish_${index+1}`] = finish.value;
+      playerRightFinishes.forEach((finish) => {
+        reportJson[`p2_finish_${finish.dataset.leg}`] = finish.value;
       });
 
       const submitData = JSON.stringify(reportJson);
@@ -418,7 +418,6 @@ $players_array = $loaded_lookup_data['players_array'];
       form.appendChild(input);
 
       document.body.appendChild(form);
-
       form.submit();
     }
 
