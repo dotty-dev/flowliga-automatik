@@ -130,6 +130,9 @@ function get_game_data($game_hash, $last_leg_winner, $loser_rest, $winner_finish
             // else substract all thrown scores to get rest points
           } else {
             $rest[$playerIterator][$legNumber] -= $score;
+            if($rest[$playerIterator][$legNumber] < 0) {
+              $rest[$playerIterator][$legNumber] = 0;
+            }
             if ($rest[$playerIterator][$legNumber] == 0) {
               $finishes[$playerIterator][$legNumber] = $score;
               $players[$playerIterator]["legsWon"] += 1;
