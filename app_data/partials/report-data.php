@@ -4,17 +4,41 @@
 function get_game_data($game_hash, $last_leg_winner, $loser_rest, $winner_finish)
 {
 
-  if (remote_file_exists("https://lidarts.org/api/game/{$game_hash}")) {
-    global $json;
-    global $game_data;
-    $json = file_get_contents("https://lidarts.org/api/game/{$game_hash}");
+  try {
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/)");
+    curl_setopt($ch, CURLOPT_URL, "https://lidarts.org/api/game/$game_hash");
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_FAILONERROR, true);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // Only if necessary for SSL issues
+    
+    $json = curl_exec($ch);
+    
+    if ($json === false) {
+      throw new Exception(curl_error($ch));
+    }
+    
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    if ($httpCode !== 200) {
+      throw new Exception("HTTP request failed. Status code: " . $httpCode);
+    }
+    
+    curl_close($ch);
+    
     // turn api json to array, "match_json" entry is json saved as string
     $game_data = json_decode($json, true);
+    if (json_last_error() !== JSON_ERROR_NONE) {
+      throw new Exception("Failed to decode JSON: " . json_last_error_msg());
+    }
+    
     // turn api entry "match_json" from string to associative array
-    $game_data["match_json"] = json_decode($game_data["match_json"], TRUE);
-  }
+    $game_data["match_json"] = json_decode($game_data["match_json"], true);
 
-  if (!isset($game_data)) {
+    if (json_last_error() !== JSON_ERROR_NONE) {
+      throw new Exception("Failed to decode match_json: " . json_last_error_msg());
+    }
+  } catch (Exception $e) {
+    error_log("Error fetching game data: " . $e->getMessage());
     includeWithVariables('app_data/partials/report-error.php', array(
       'error_reason' => 'gameNotFound',
       'game_hash' => $game_hash
