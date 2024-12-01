@@ -81,7 +81,7 @@ function get_game_data_manual($game_data_manual)
     'rest' => $rest,
     'finishes' => $finishes,
     'discord_ids' => $players_discord_ids,
-    'game_hash' => $game_data_manual["game_hash"],
+    'game_id' => $game_data_manual["game_id"],
     'comment' => $game_data_manual["comment"],
   ];
 }

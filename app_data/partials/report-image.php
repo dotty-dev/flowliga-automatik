@@ -13,7 +13,9 @@ $img = imagecreatefrompng("app_data/report.png");
 // color to use for text
 $black = imagecolorallocate($img, 0, 0, 0);
 $red = imagecolorallocate($img, 255, 0, 0);
-
+$blue = imagecolorallocate($img, 0, 0, 255);
+$orange = imagecolorallocate($img, 255, 165, 0);
+ 
 // path to font file, ttf or odf
 $font = "app_data/iosevka-extendedbold.ttf";
 // $font = "app_data/camingocode/CamingoCode-Bold.ttf";
@@ -83,17 +85,33 @@ imagettftext(
   $dateShort // text to add
 );
 
+// if $game_id is uuid v4 set $id_text to "autodarts"
+$platform = determineGameType($game_id);
+$platform_color = $black;
 
-// lidarts game hash 
+switch($platform) {
+  case 'autodarts':
+    $platform = 'autodarts';
+    $platform_color = $blue;
+    break;
+  case 'lidarts':
+    $platform = 'lidarts';
+    $platform_color = $orange;
+    break;
+  default:
+    $platform = 'unknown';
+    $platform_color = $red;
+}
+
 imagettftext(
   $img,
-  18,
+  16,
   0,
   12,
   210,
-  strlen($game_hash) > 8 ? $red : $black,
+  $platform_color,
   $font,
-  substr($game_hash,0,8)
+  $platform
 );
 
 // winner mark [X]

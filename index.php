@@ -3,6 +3,7 @@
 // ini_set('display_startup_errors', '1');
 // error_reporting(E_ALL);
 
+require 'app_data/partials/autodarts-keycloak-auth.php';
 include('app_data/partials/utility-functions.php');
 
 $cancelled = false;
@@ -16,9 +17,10 @@ $players_array = $loaded_lookup_data['players_array'];
 
 
 // load game data from lidarts
+// if (true) {
 if (array_key_exists('game', $_GET)) {
-  global $game_hash;
-  $game_hash = $_GET["game"];
+  global $game_id;
+  $game_id = $_GET["game"];
 
   $game_data = includeWithVariables('app_data/partials/report-data.php', array(
     'players_array' => $players_array
@@ -26,9 +28,9 @@ if (array_key_exists('game', $_GET)) {
 }
 
 if (array_key_exists('game', $_POST)) {
-  global $game_hash;
+  global $game_id;
   global $last_leg_winner;
-  $game_hash = $_POST["game"];
+  $game_id = $_POST["game"];
   $last_leg_winner = array_key_exists('last-leg-winner', $_POST) ? $_POST["last-leg-winner"] : false;
   $loser_rest = array_key_exists('loser-rest', $_POST) ? $_POST["loser-rest"] : false;
   $winner_finish = array_key_exists('winner-finish', $_POST) ? $_POST["winner-finish"] : false;
@@ -48,18 +50,31 @@ if (array_key_exists('json', $_POST)) {
     $rest = $game_data['rest'];
     $finishes = $game_data['finishes'];
     $players_discord_ids = $game_data['discord_ids'];
-    $game_hash = $game_data['game_hash'] . " manuell";
+    $game_id = $game_data['game_id'] . " manuell";
     $comment = $game_data['comment'];
     $manual_report = true;
   }
 }
 
-if (isset($game_hash) && $manual_report === false) {
+// if (true) {
+if (isset($game_id) && $manual_report === false) {
   global $game_data;
   global $last_leg_winner;
   global $loser_rest;
   global $winner_finish;
-  $game_data = get_game_data($game_hash, $last_leg_winner, $loser_rest, $winner_finish);
+  // $game_data = get_autodarts_match_data("aaefef80-9976-49c7-a0dd-777f6ec76772");
+  $game_type = determineGameType($game_id);
+  switch ($game_type) {
+    case 'autodarts':
+      $game_data = get_autodarts_match_data($game_id);
+      break;
+    case 'lidarts':
+      $game_data = get_game_data($game_id, $last_leg_winner, $loser_rest, $winner_finish);
+      break;
+    default:
+      throw new Exception("Unsupported game type: ". $game_type);
+      return;
+  }
   if (is_array($game_data)) {
     // set to own variables for easier access
     $date = $game_data['date'];
@@ -93,7 +108,7 @@ if (isset($players)) {
       'player1_name' => $players[1]['name'],
       'player2_name' => $players[2]['name'],
       'error_reason' => 'noPairing',
-      'game_hash' => $game_hash
+      'game_id' => $game_id
     ));
   }
 
@@ -107,7 +122,7 @@ if (isset($players)) {
     // var_dump(isset($last_leg_winner));
     includeWithVariables('app_data/partials/report-error.php', array(
       'error_reason' => 'lastLegUnfinished',
-      'game_hash' => $game_hash,
+      'game_id' => $game_id,
       'players' => $players,
     ));
     return;
@@ -119,7 +134,7 @@ if (isset($players)) {
     'app_data/partials/report-image.php',
     array(
       'game_number' => $game_number,
-      'game_hash' => $game_hash,
+      'game_id' => $game_id,
       'date' => $date,
       'switched' => $switched,
       'players' => $players,
@@ -141,7 +156,7 @@ if (isset($players)) {
     $report_submitted = post_report(array(
       'image' => $image,
       'game_number' => $game_number,
-      'game_hash' => $game_hash,
+      'game_id' => $game_id,
       'date' => $date,
       'switched' => $switched,
       'players' => $players,
@@ -212,7 +227,7 @@ if (isset($players)) {
             echo "<input type=\"hidden\" name=\"cancelled\" value=\"" . $game_number . "\">";
             echo "<input type=\"hidden\" name=\"cancelledPoints\" value=\"" . $cancelledPoints . "\">";
           } else if ($cancelled == false) {
-            echo "<input type=\"hidden\" name=\"game\" value=\"" . $game_hash . "\">";
+            echo "<input type=\"hidden\" name=\"game\" value=\"" . $game_id . "\">";
           }
 
           if (isset($last_leg_winner) && $last_leg_winner > 0) {

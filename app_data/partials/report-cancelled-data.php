@@ -40,7 +40,7 @@ $finishes = [
 
 $cancelled = true;
 $game_number = $_POST['cancelled'];
-$game_hash = '--------';
+$game_id = '--------';
 $pairing = get_game_pairing_by_number($games_array, $game_number);
 $date = date("d.m.Y");
 $players = [

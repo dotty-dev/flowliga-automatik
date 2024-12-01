@@ -46,7 +46,7 @@
               break;
             case 'noPairing':
               $error_text = "Es konnte keine Spielpaarung für \"$player1_name\" gegen \"$player2_name\" gefunden werden.";
-              $error_post_text = "$error_text Lidarts Spiel: https://lidarts.org/game/$game_hash";
+              $error_post_text = "$error_text Lidarts Spiel: https://lidarts.org/game/$game_id";
               $error_text = "$error_text Die Ligaleitung ist informiert und kümmert sich um das Problem.";
               break;
             case 'wrongMode':
@@ -54,12 +54,12 @@
               break;
             case 'playersNotFoundBoth':
               $error_text = "Die Lidarts-Accounts \"$player1_name\" und \"$player2_name\" konnten keinen Ligateilnehmern zugeordnet werden.";
-              $error_post_text = "$error_text Lidarts Spiel: https://lidarts.org/game/$game_hash";
+              $error_post_text = "$error_text Lidarts Spiel: https://lidarts.org/game/$game_id";
               $error_text = "$error_text Die Ligaleitung ist informiert und kümmert sich um das Problem.";
               break;
             case 'playerNotFound':
               $error_text = "Der Lidarts-Account \"$player_name\" konnte keinem Ligateilnehmer zugeorgnet werden.";
-              $error_post_text = "$error_text Lidarts Spiel: https://lidarts.org/game/$game_hash";
+              $error_post_text = "$error_text Lidarts Spiel: https://lidarts.org/game/$game_id";
               $error_text = "$error_text Die Ligaleitung ist informiert und kümmert sich um das Problem.";
               break;
             case 'webhookErrors':
@@ -84,8 +84,8 @@
           }
 
           if (isset($error_post_text)) {
-            if(!isset($game_hash)) {
-              $game_hash = '--------';
+            if(!isset($game_id)) {
+              $game_id = '--------';
             }
             $report_error = false;
             if (file_exists('app_data/errors.csv')) {
@@ -102,7 +102,7 @@
                 "a"
               );
               $date = date("Y-m-d H:i:s", time());
-              fwrite($error_log_file, "\"$game_hash\", \"$error_post_text\", \"$date\"\n");
+              fwrite($error_log_file, "\"$game_id\", \"$error_post_text\", \"$date\"\n");
               fclose($error_log_file);
               // if (!exec('grep ' . escapeshellarg($error_post_text) . ' ./app_data/errors.csv')) {
               // setup data for webhook request
@@ -140,7 +140,7 @@
 
       if ($error_reason == 'lastLegUnfinished') { ?>
         <form method="post" action="./">
-          <input type="hidden" name="game" value="<?php echo $game_hash ?>">
+          <input type="hidden" name="game" value="<?php echo $game_id ?>">
           <label for="last-leg-won">Gewinner des letzten Legs</label>
           <select value="0" name="last-leg-winner" id="last-leg-winner" required>
             <option value="">Bitte auswählen...</option>
@@ -158,7 +158,7 @@
         </form>
       <?php } else { ?>
         <div class="grid">
-          <button role="button" id="back-home" data-faulty-hash="<?php if (isset($game_hash)) echo $game_hash ?>" onClick="backToIndex(event)">Zurück</butt>
+          <button role="button" id="back-home" data-faulty-hash="<?php if (isset($game_id)) echo $game_id ?>" onClick="backToIndex(event)">Zurück</butt>
         </div>
       <?php } ?>
     </article>

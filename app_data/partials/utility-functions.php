@@ -204,3 +204,18 @@ function lookup_result($needle, $haystack)
   }
   return "";
 }
+
+function determineGameType($game_id) {
+  // Check if it's a lidarts game (8 characters long)
+  if (strlen($game_id) === 8 && ctype_alnum($game_id)) {
+      return 'lidarts';
+  }
+  
+  // Check if it's an autodarts game (UUID v4 format)
+  if (preg_match('/^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i', $game_id)) {
+      return 'autodarts';
+  }
+  
+  // If neither condition is met
+  return 'unknown';
+}

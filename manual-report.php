@@ -366,7 +366,7 @@ $players_array = $loaded_lookup_data['players_array'];
     function sendReportData() {
 
       reportJson = {
-        "game_hash": lidartsUrl.value.split("/").at(this.length - 1),
+        "game_id": lidartsUrl.value.split("/").at(this.length - 1),
         "date": matchDateElement.value,
         "p1_name": playerLeftElement.value,
         "p2_name": playerRightElement.value,

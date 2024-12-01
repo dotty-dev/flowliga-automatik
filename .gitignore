@@ -27,6 +27,11 @@ assets_live/*
 release
 release/*
 
+# vendor files, should be installed via composer.json
+vendor/*
+
+# autodarts-token.json should not be checked out because it will be fetched by code
+app_data/autodarts-token.json
 
 *.csv
 *.bak

@@ -46,7 +46,7 @@ function post_report($reportData)
   $player1_color = $player1_winner == 1 ? "8237656" : "13839686";
   $player2_color = $player2_winner == 1 ? "8237656" : "13839686";
 
-  $game_url = "https://lidarts.org/game/{$reportData['game_hash']}";
+  $game_url = "https://lidarts.org/game/{$reportData['game_id']}";
 
   $winner_loser = array(
     "{Sieger}" => $player1_winner == 1 ? $player1_name : $player2_name,
@@ -180,7 +180,7 @@ function post_report($reportData)
   $image_temp_filename = stream_get_meta_data($image_temp_file)['uri'];
 
   // string for post content with mentions of the involved players
-  $report_post_mention = "<@{$reportData['player_discord_ids'][$player1]}> <@{$reportData['player_discord_ids'][$player2]}> https://lidarts.org/game/{$reportData['game_hash']}";
+  $report_post_mention = "<@{$reportData['player_discord_ids'][$player1]}> <@{$reportData['player_discord_ids'][$player2]}> https://lidarts.org/game/{$reportData['game_id']}";
 
   // setup request data to send to webhook
   // request with file is not being encoded as json!
@@ -223,7 +223,7 @@ function post_report($reportData)
     $berichteFile = fopen("app_data/results.csv", "a");
     fwrite($berichteFile, $csv_result . "\n");
     fclose($berichteFile);
-    deleteLineInFile('app_data/errors.csv', $reportData['game_hash']);
+    deleteLineInFile('app_data/errors.csv', $reportData['game_id']);
 
   } else {
     includeWithVariables('app_data/partials/report-error.php', array(
