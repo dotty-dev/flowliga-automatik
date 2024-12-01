@@ -1,16 +1,10 @@
 <?php
 
 require 'vendor/autoload.php';
+require 'autodarts-auth-data.php';
 
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
-
-$baseURL      = "https://login.autodarts.io";
-$realm        = "autodarts";
-$clientID     = "developer-dotty-flow-liga";
-$clientSecret = "AyiqXusLNmi9KmjyV5Yj3UQVycZ2js47";
-$userName     = "dotty";
-$password     = "HMPF9xgyqZQMFzkjwMh3";
 
 $token = null;
 // Read contents of file autodarts-token.json
@@ -72,7 +66,6 @@ function fetchToken()
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     curl_close($ch);
     
-    echo $httpCode;
     if ($httpCode !== 200) {
         throw new Exception("Failed to fetch token");
     }
