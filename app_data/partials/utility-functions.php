@@ -136,6 +136,21 @@ function loadLookupFiles()
   // remove csv header entries 
   array_shift($players_array_trimmed);
 
+  $players_autodarts_file = "app_data/players-autodarts.csv";
+  if (file_exists($players_autodarts_file)) {
+    $players_autodarts_csv = file_get_contents($players_autodarts_file);
+    $players_autodarts_array = array_map("str_getcsv", explode("\n", $players_autodarts_csv));
+    $players_autodarts_array_trimmed = array_map(function ($arrayItem) {
+      return flow_array_trim($arrayItem);
+    }, $players_autodarts_array);
+  } else {
+    return includeWithVariables('app_data/partials/report-error.php', array(
+      'error_reason' => 'noAutodartsPlayersFile'
+    ));
+  }
+  // remove csv header entries 
+  array_shift($players_autodarts_array_trimmed);
+
 
   /** 
    * load game pairings from file, csv format
@@ -162,7 +177,7 @@ function loadLookupFiles()
   // remove csv header entries 
   array_shift($games_array_trimmed);
 
-  return ["players_array" => $players_array_trimmed, "games_array" => $games_array_trimmed];
+  return ["players_array" => $players_array_trimmed, "games_array" => $games_array_trimmed, "players_autodarts_array" => $players_autodarts_array_trimmed];
 }
 
 function loadResultArray()
@@ -205,7 +220,7 @@ function lookup_result($needle, $haystack)
   return "";
 }
 
-function determineGameType($game_id) {
+function determinePlatform($game_id) {
   // Check if it's a lidarts game (8 characters long)
   if (strlen($game_id) === 8 && ctype_alnum($game_id)) {
       return 'lidarts';

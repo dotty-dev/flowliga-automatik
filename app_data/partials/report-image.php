@@ -86,7 +86,7 @@ imagettftext(
 );
 
 // if $game_id is uuid v4 set $id_text to "autodarts"
-$platform = determineGameType($game_id);
+$platform = determinePlatform($game_id);
 $platform_color = $black;
 
 switch($platform) {

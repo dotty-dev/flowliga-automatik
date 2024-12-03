@@ -107,7 +107,6 @@ function get_autodarts_match_data($matchId)
       $playerIndex = array_search($playerStat["playerId"], $playerIds);
       $playerNumber = $playerIndex + 1;
 
-
       $rest[$playerNumber][$legNumber] -= $playerStat["score"];
 
       $finishes[$playerNumber][$legNumber] = $playerStat["checkoutPoints"];
@@ -135,14 +134,14 @@ function get_autodarts_match_data($matchId)
 
   // Lookup autodarts names in $players_array
   for ($i = 1; $i <= 2; $i++) {
-    global $players_array;
+    global $players_autodarts_array;
     $player_keys[$i] = array_search(
       strtolower($players[$i]['name']),
-      array_map('strtolower', array_column($players_array, 1))
+      array_map('strtolower', array_column($players_autodarts_array, 1))
     );
     if ($player_keys[$i] !== false) {
-      $players[$i]['name'] = $players_array[$player_keys[$i]][0];
-      $players_discord_ids[$i] = $players_array[$player_keys[$i]][2];
+      $players[$i]['name'] = $players_autodarts_array[$player_keys[$i]][0];
+      $players_discord_ids[$i] = $players_autodarts_array[$player_keys[$i]][2];
     }
   }
 
