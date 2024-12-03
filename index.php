@@ -14,6 +14,7 @@ $loaded_lookup_data = loadLookupFiles();
 if (is_array($loaded_lookup_data) == false) return;
 $games_array = $loaded_lookup_data['games_array'];
 $players_array = $loaded_lookup_data['players_array'];
+$players_autodarts_array = $loaded_lookup_data['players_autodarts_array'];
 
 
 // load game data from lidarts
@@ -63,7 +64,7 @@ if (isset($game_id) && $manual_report === false) {
   global $loser_rest;
   global $winner_finish;
   // $game_data = get_autodarts_match_data("aaefef80-9976-49c7-a0dd-777f6ec76772");
-  $game_type = determineGameType($game_id);
+  $game_type = determinePlatform($game_id);
   switch ($game_type) {
     case 'autodarts':
       $game_data = get_autodarts_match_data($game_id);
