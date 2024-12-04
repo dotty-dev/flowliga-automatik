@@ -94,7 +94,8 @@ function get_game_pairing($games_array, $players)
 {
   $pairing = false;
   foreach ($games_array as $entry => $subArray) {
-    if (in_array($players[0], $subArray) && in_array($players[1], $subArray)) {
+    $lowercaseSubArray = array_map('strtolower', $subArray);
+    if (in_array(strtolower($players[0]), $lowercaseSubArray) && in_array(strtolower($players[1]), $lowercaseSubArray)) {
       $pairing = $subArray;
       break;
     }
@@ -124,17 +125,17 @@ function loadLookupFiles()
   $players_file = "app_data/players.csv";
   if (file_exists($players_file)) {
     $players_csv = file_get_contents($players_file);
-    $players_array = array_map("str_getcsv", explode("\n", $players_csv));
-    $players_array_trimmed = array_map(function ($arrayItem) {
+    $players_lidarts_array = array_map("str_getcsv", explode("\n", $players_csv));
+    $players_lidarts_array_trimmed = array_map(function ($arrayItem) {
       return flow_array_trim($arrayItem);
-    }, $players_array);
+    }, $players_lidarts_array);
   } else {
     return includeWithVariables('app_data/partials/report-error.php', array(
       'error_reason' => 'noPlayersFile'
     ));
   }
   // remove csv header entries 
-  array_shift($players_array_trimmed);
+  array_shift($players_lidarts_array_trimmed);
 
   $players_autodarts_file = "app_data/players-autodarts.csv";
   if (file_exists($players_autodarts_file)) {
@@ -177,7 +178,7 @@ function loadLookupFiles()
   // remove csv header entries 
   array_shift($games_array_trimmed);
 
-  return ["players_array" => $players_array_trimmed, "games_array" => $games_array_trimmed, "players_autodarts_array" => $players_autodarts_array_trimmed];
+  return ["players_array" => $players_lidarts_array_trimmed, "games_array" => $games_array_trimmed, "players_autodarts_array" => $players_autodarts_array_trimmed];
 }
 
 function loadResultArray()
@@ -220,17 +221,40 @@ function lookup_result($needle, $haystack)
   return "";
 }
 
-function determinePlatform($game_id) {
+function lookupLeagueNameAndDiscordIDs($players, $players_lidarts_array)
+{
+  $players_discord_ids = [];
+  $playerNames = [];
+  foreach ([1, 2] as $i) {
+    $player_key = array_search(
+      strtolower($players[$i]['name']),
+      array_map('strtolower', array_column($players_lidarts_array, 1))
+    );
+    if ($player_key !== false) {
+      $playerNames[$i] = $players_lidarts_array[$player_key][0];
+      $players_discord_ids[$i] = $players_lidarts_array[$player_key][2];
+    } else {
+      throw new Exception("Player not found: {$players[$i]['name']}");
+    }
+  }
+  return [
+    'playerNames' => $playerNames,
+    'discordIDs' => $players_discord_ids
+  ];
+}
+
+function determinePlatform($game_id)
+{
   // Check if it's a lidarts game (8 characters long)
   if (strlen($game_id) === 8 && ctype_alnum($game_id)) {
-      return 'lidarts';
+    return 'lidarts';
   }
-  
+
   // Check if it's an autodarts game (UUID v4 format)
   if (preg_match('/^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i', $game_id)) {
-      return 'autodarts';
+    return 'autodarts';
   }
-  
+
   // If neither condition is met
   return 'unknown';
 }

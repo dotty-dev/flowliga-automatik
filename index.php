@@ -13,7 +13,7 @@ $comment = "";
 $loaded_lookup_data = loadLookupFiles();
 if (is_array($loaded_lookup_data) == false) return;
 $games_array = $loaded_lookup_data['games_array'];
-$players_array = $loaded_lookup_data['players_array'];
+$players_lidarts_array = $loaded_lookup_data['players_array'];
 $players_autodarts_array = $loaded_lookup_data['players_autodarts_array'];
 
 
@@ -24,7 +24,7 @@ if (array_key_exists('game', $_GET)) {
   $game_id = $_GET["game"];
 
   $game_data = includeWithVariables('app_data/partials/report-data.php', array(
-    'players_array' => $players_array
+    'players_array' => $players_lidarts_array
   ));
 }
 
@@ -36,7 +36,7 @@ if (array_key_exists('game', $_POST)) {
   $loser_rest = array_key_exists('loser-rest', $_POST) ? $_POST["loser-rest"] : false;
   $winner_finish = array_key_exists('winner-finish', $_POST) ? $_POST["winner-finish"] : false;
   includeWithVariables('app_data/partials/report-data.php', array(
-    'players_array' => $players_array
+    'players_array' => $players_lidarts_array
   ));
 }
 
@@ -70,7 +70,7 @@ if (isset($game_id) && $manual_report === false) {
       $game_data = get_autodarts_match_data($game_id);
       break;
     case 'lidarts':
-      $game_data = get_game_data($game_id, $last_leg_winner, $loser_rest, $winner_finish);
+      $game_data = getLidartsGameData($game_id, $last_leg_winner, $loser_rest, $winner_finish);
       break;
     default:
       throw new Exception("Unsupported game type: ". $game_type);
@@ -114,7 +114,7 @@ if (isset($players)) {
   }
 
   // check if first player in $players is same as first player in $game_pairing, if not: set true
-  $switched = !($players[1]['name'] == $game_pairing[1]);
+  $switched = (strcasecmp($players[1]['name'], $game_pairing[1]) !== 0);
 
   // set $game_number from $game_pairing, for easier access
   $game_number = $game_pairing[0];

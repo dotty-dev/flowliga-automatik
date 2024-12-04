@@ -38,5 +38,6 @@ app_data/autodarts-token.json
 
 *.csv
 *.bak
+app_data/*.json
 
 app_data/flowliga.sqlite

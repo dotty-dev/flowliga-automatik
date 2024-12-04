@@ -63,15 +63,15 @@ function get_game_data_manual($game_data_manual)
     ]
   ];
 
-  // lookup lidarts names in $players_array
+  // lookup lidarts names in $players_lidarts_array
   for ($i = 1; $i < 3; $i++) {
-    global $players_array;
+    global $players_lidarts_array;
     $player_keys[$i] = array_search(
       strtolower($players[$i]['name']),
-      array_map('strtolower', array_column($players_array, 0))
+      array_map('strtolower', array_column($players_lidarts_array, 0))
     );
     if ($player_keys[$i] !== false) {
-      $players_discord_ids[$i] = $players_array[$player_keys[$i]][2];
+      $players_discord_ids[$i] = $players_lidarts_array[$player_keys[$i]][2];
     }
   }
 

@@ -5,7 +5,7 @@ include('app_data/partials/utility-functions.php');
 $loaded_lookup_data = loadLookupFiles();
 if (is_array($loaded_lookup_data) == false) return;
 $games_array = $loaded_lookup_data['games_array'];
-$players_array = $loaded_lookup_data['players_array'];
+$players_lidarts_array = $loaded_lookup_data['players_array'];
 
 ?>
 
