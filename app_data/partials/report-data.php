@@ -79,7 +79,7 @@ function fetchAutodartsApiData($apiUrl, $token)
 function calculateRestSumAndWinner(&$rest, &$players)
 {
   foreach ([1, 2] as $i) {
-    $rest[$i]['sum'] = array_sum(array_slice($rest[$i], 1, 5));
+    $rest[$i]['sum'] = array_sum(array_slice($rest[$i], 0, 5));
   }
   if ($rest[1]['sum'] != $rest[2]['sum']) {
     $winner = $rest[1]['sum'] > $rest[2]['sum'] ? 2 : 1;
@@ -92,7 +92,7 @@ function calculateRestSumAndWinner(&$rest, &$players)
   }
 }
 
-function get_autodarts_match_data($matchId)
+function getAutodartsGameData($matchId)
 {
   global $players, $rest, $finishes, $players_autodarts_array;
 
@@ -266,6 +266,7 @@ function updateAutodartsPlayerScore(&$playerScore, $turn)
 function calculateAutodartsGameStats($score)
 {
   $avg = $score['darts'] > 0 ? $score['points'] / ($score['darts'] / 3) : 0;
+
   return [
     'restPoints' => $score['initialScore'],
     'checkoutPoints' => $score['checkout'],
@@ -412,8 +413,6 @@ function getLidartsGameData($game_id, $last_leg_winner, $loser_rest, $winner_fin
   $discord_ids = $lookup_results['discordIDs'];
   $players[1]['name'] = $lookup_results['playerNames'][1];
   $players[2]['name'] = $lookup_results['playerNames'][2];
-
-  
 
   // Use the existing calculateRestSumAndWinner function
   calculateRestSumAndWinner($rest, $players);

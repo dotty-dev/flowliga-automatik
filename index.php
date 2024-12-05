@@ -63,11 +63,11 @@ if (isset($game_id) && $manual_report === false) {
   global $last_leg_winner;
   global $loser_rest;
   global $winner_finish;
-  // $game_data = get_autodarts_match_data("aaefef80-9976-49c7-a0dd-777f6ec76772");
+  // $game_data = getAutodartsGameData("aaefef80-9976-49c7-a0dd-777f6ec76772");
   $game_type = determinePlatform($game_id);
   switch ($game_type) {
     case 'autodarts':
-      $game_data = get_autodarts_match_data($game_id);
+      $game_data = getAutodartsGameData($game_id);
       break;
     case 'lidarts':
       $game_data = getLidartsGameData($game_id, $last_leg_winner, $loser_rest, $winner_finish);
@@ -262,8 +262,8 @@ if (isset($players)) {
 
     <article>
       <form action="./">
-        <label for="game-link">Lidarts-URL</label>
-        <input id="game-link" name="game" type="text" placeholder="https://lidarts.org/game/ABCD1234">
+        <label for="game-link">Spiel-URL</label>
+        <input id="game-link" name="game" type="text" placeholder="https://lidarts.org/game/ABCD1234 | https://play.autodarts.io/history/matches/123e4567-e89b-12d3-a456-426614174000">
         <div class="grid">
           <button type="button" id="get-game">Laden</button>
           <div>

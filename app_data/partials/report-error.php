@@ -34,6 +34,10 @@
           <?php
           global $error_text;
           $error_text = '';
+          // Add base URLs for lidarts and autodarts
+          $lidarts_base_url = "https://lidarts.org/game/";
+          $autodarts_base_url = "https://play.autodarts.io/history/matches/";
+          $game_url = (strpos($game_id, '-') !== false) ? $autodarts_base_url . $game_id : $lidarts_base_url . $game_id;
           switch ($error_reason) {
             case 'gameNotFound':
               $error_text = "Es konnte leider kein Spiel unter der angegeben Adresse gefunden werden, bitte überprüfe ob die Adresse korrekt ist.";
@@ -46,7 +50,7 @@
               break;
             case 'noPairing':
               $error_text = "Es konnte keine Spielpaarung für \"$player1_name\" gegen \"$player2_name\" gefunden werden.";
-              $error_post_text = "$error_text Lidarts Spiel: https://lidarts.org/game/$game_id";
+              $error_post_text = "$error_text Lidarts Spiel: $game_url";
               $error_text = "$error_text Die Ligaleitung ist informiert und kümmert sich um das Problem.";
               break;
             case 'wrongMode':
@@ -54,12 +58,12 @@
               break;
             case 'playersNotFoundBoth':
               $error_text = "Die Lidarts-Accounts \"$player1_name\" und \"$player2_name\" konnten keinen Ligateilnehmern zugeordnet werden.";
-              $error_post_text = "$error_text Lidarts Spiel: https://lidarts.org/game/$game_id";
+              $error_post_text = "$error_text Lidarts Spiel: $game_url";
               $error_text = "$error_text Die Ligaleitung ist informiert und kümmert sich um das Problem.";
               break;
             case 'playerNotFound':
               $error_text = "Der Lidarts-Account \"$player_name\" konnte keinem Ligateilnehmer zugeorgnet werden.";
-              $error_post_text = "$error_text Lidarts Spiel: https://lidarts.org/game/$game_id";
+              $error_post_text = "$error_text Lidarts Spiel: $game_url";
               $error_text = "$error_text Die Ligaleitung ist informiert und kümmert sich um das Problem.";
               break;
             case 'webhookErrors':
@@ -84,7 +88,7 @@
           }
 
           if (isset($error_post_text)) {
-            if(!isset($game_id)) {
+            if (!isset($game_id)) {
               $game_id = '--------';
             }
             $report_error = false;
