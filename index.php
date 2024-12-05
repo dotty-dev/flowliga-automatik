@@ -73,8 +73,9 @@ if (isset($game_id) && $manual_report === false) {
       $game_data = getLidartsGameData($game_id, $last_leg_winner, $loser_rest, $winner_finish);
       break;
     default:
-      throw new Exception("Unsupported game type: ". $game_type);
-      return;
+      return includeWithVariables('app_data/partials/report-error.php', array(
+        'error_reason' => 'wrongMode',
+      ));
   }
   if (is_array($game_data)) {
     // set to own variables for easier access

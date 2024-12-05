@@ -246,7 +246,7 @@ function lookupLeagueNameAndDiscordIDs($players, $players_lidarts_array)
 function determinePlatform($game_id)
 {
   // Check if it's a lidarts game (8 characters long)
-  if (strlen($game_id) === 8 && ctype_alnum($game_id)) {
+  if (strlen($game_id) === 8) {
     return 'lidarts';
   }
 

@@ -242,7 +242,8 @@ for ($i = 1; $i < 6; $i++) {
     get_leg_y_pos($i),
     $black,
     $font,
-    $finishes[$player1][$i] === 0 ? '-' : $finishes[$player1][$i]
+    // $finishes[$player1][$i] === 0 ? '-' : $finishes[$player1][$i]
+    (is_null($finishes[$player1][$i]) || $finishes[$player1][$i] === '' || $finishes[$player1][$i] === 0) ? '-' : $finishes[$player1][$i]
   );
 }
 

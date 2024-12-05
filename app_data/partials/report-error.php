@@ -37,7 +37,9 @@
           // Add base URLs for lidarts and autodarts
           $lidarts_base_url = "https://lidarts.org/game/";
           $autodarts_base_url = "https://play.autodarts.io/history/matches/";
-          $game_url = (strpos($game_id, '-') !== false) ? $autodarts_base_url . $game_id : $lidarts_base_url . $game_id;
+          if (isset($game_id) && !empty($game_id)) {
+          $game_url = (strlen($game_id) !== 8) ? $autodarts_base_url . $game_id : $lidarts_base_url . $game_id;
+          }
           switch ($error_reason) {
             case 'gameNotFound':
               $error_text = "Es konnte leider kein Spiel unter der angegeben Adresse gefunden werden, bitte überprüfe ob die Adresse korrekt ist.";

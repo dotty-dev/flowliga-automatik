@@ -81,6 +81,7 @@ function calculateRestSumAndWinner(&$rest, &$players)
   foreach ([1, 2] as $i) {
     $rest[$i]['sum'] = array_sum(array_slice($rest[$i], 0, 5));
   }
+
   if ($rest[1]['sum'] != $rest[2]['sum']) {
     $winner = $rest[1]['sum'] > $rest[2]['sum'] ? 2 : 1;
     $rest['diff'] = abs($rest[1]['sum'] - $rest[2]['sum']);
@@ -339,7 +340,7 @@ function getLidartsGameData($game_id, $last_leg_winner, $loser_rest, $winner_fin
     ]);
   }
 
-  if ($game_data["bo_legs"] != 9 || $game_data["bo_sets"] != 1) {
+  if (($game_data["bo_legs"] != 9 || $game_data["bo_sets"] != 1) && $game_data["fixed_legs"] == false || ($game_data["fixed_legs"] == true && $game_data["fixed_legs_amount"] != 5)) {
     return includeWithVariables('app_data/partials/report-error.php', [
       'error_reason' => 'wrongMode'
     ]);
@@ -364,9 +365,6 @@ function getLidartsGameData($game_id, $last_leg_winner, $loser_rest, $winner_fin
     ]
   ];
 
-  $rest = [1 => ['sum' => 0], 2 => ['sum' => 0]];
-  $finishes = [1 => [], 2 => []];
-
   if (count($game_data["match_json"][1]) < 5) {
     return includeWithVariables('app_data/partials/report-error.php', [
       'error_reason' => 'gameNotFinished',
@@ -388,7 +386,6 @@ function getLidartsGameData($game_id, $last_leg_winner, $loser_rest, $winner_fin
           break;
         }
       }
-      $rest[$playerIndex]['sum'] += $rest[$playerIndex][$legNumber];
     }
   }
 
@@ -405,8 +402,6 @@ function getLidartsGameData($game_id, $last_leg_winner, $loser_rest, $winner_fin
     $rest[$loser]['sum'] += $loser_rest - $rest[$loser][5];
   }
 
-  // Use the existing calculateRestSumAndWinner function
-  calculateRestSumAndWinner($rest, $players);
 
   // Lookup Discord IDs for players
   $lookup_results = lookupLeagueNameAndDiscordIDs($players, $players_lidarts_array);
