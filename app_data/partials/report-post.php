@@ -182,8 +182,11 @@ function post_report($reportData)
   fwrite($image_temp_file, $image);
   $image_temp_filename = stream_get_meta_data($image_temp_file)['uri'];
 
+  // Create a markdown-style titled link
+  $game_link_message = "[Link zum Spiel auf {$platform}](<{$game_url}>)";
+
   // string for post content with mentions of the involved players
-  $report_post_mention = "<@{$reportData['player_discord_ids'][$player1]}> <@{$reportData['player_discord_ids'][$player2]}> {$game_url}";
+  $report_post_mention = "<@{$reportData['player_discord_ids'][$player1]}> <@{$reportData['player_discord_ids'][$player2]}> \n{$game_link_message}";
 
   // setup request data to send to webhook
   // request with file is not being encoded as json!
