@@ -16,7 +16,6 @@ $games_array = $loaded_lookup_data['games_array'];
 $players_lidarts_array = $loaded_lookup_data['players_array'];
 $players_autodarts_array = $loaded_lookup_data['players_autodarts_array'];
 
-
 // load game data from lidarts
 // if (true) {
 if (array_key_exists('game', $_GET)) {

@@ -3,6 +3,7 @@ rm -r release/*
 cp -r app_data/ release/
 cp -r app_data_live/* release/app_data/
 cp -r assets/ release/
+cp -r vendor/ release/vendor/
 cp assets_live/* release/assets/
 cp index.php release/
 cp overview.php release/
@@ -16,7 +17,10 @@ rm release/app_data/matches.csv
 rm release/app_data/results.csv
 rm release/app_data/errors.csv
 rm release/app_data/bericht.svg
+rm release/app_data/autodarts-token.json
+rm release/app_data/partials/report-data-old.php
+rm release/app_data/partials/autodarts-auth-data.php
 
 
-7z a /home/dotty/spielbericht_automatik_release/spielbericht_automatik_v2_$(date -d "today" +"%Y%m%d%H%M%S").zip ./release/{*,.[!.]*}
+7z a /home/dotty/spielbericht_automatik_release/spielbericht_automatik_v2_AD_$(date -d "today" +"%Y%m%d%H%M%S").zip ./release/{*,.[!.]*}
 

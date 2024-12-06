@@ -225,6 +225,7 @@ function lookupLeagueNameAndDiscordIDs($players, $players_lidarts_array)
 {
   $players_discord_ids = [];
   $playerNames = [];
+  $error = null;
   foreach ([1, 2] as $i) {
     $player_key = array_search(
       strtolower($players[$i]['name']),
@@ -234,12 +235,33 @@ function lookupLeagueNameAndDiscordIDs($players, $players_lidarts_array)
       $playerNames[$i] = $players_lidarts_array[$player_key][0];
       $players_discord_ids[$i] = $players_lidarts_array[$player_key][2];
     } else {
-      throw new Exception("Player not found: {$players[$i]['name']}");
+      $playerNames[$i] = false;
+      $players_discord_ids[$i] = false;
     }
+  }
+
+  // Error handling
+  if ($playerNames[1] === false && $playerNames[2] === false) {
+    $error = [
+      'reason' => 'playersNotFoundBoth',
+      'player1_name' => $players[1]['name'],
+      'player2_name' => $players[2]['name']
+    ];
+  } elseif ($playerNames[1] === false) {
+    $error = [
+      'reason' => 'playerNotFound',
+      'player_name' => $players[1]['name']
+    ];
+  } elseif ($playerNames[2] === false) {
+    $error = [
+      'reason' => 'playerNotFound',
+      'player_name' => $players[2]['name']
+    ];
   }
   return [
     'playerNames' => $playerNames,
-    'discordIDs' => $players_discord_ids
+    'discordIDs' => $players_discord_ids,
+    'error' => $error
   ];
 }
 

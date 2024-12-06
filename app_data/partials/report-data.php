@@ -409,6 +409,10 @@ function getLidartsGameData($game_id, $last_leg_winner, $loser_rest, $winner_fin
   $players[1]['name'] = $lookup_results['playerNames'][1];
   $players[2]['name'] = $lookup_results['playerNames'][2];
 
+  if ($lookup_results['error'] !== null) {
+    // Handle the error
+    return includeWithVariables('app_data/partials/report-error.php', $lookup_results['error']);
+  }
   // Use the existing calculateRestSumAndWinner function
   calculateRestSumAndWinner($rest, $players);
   return [
