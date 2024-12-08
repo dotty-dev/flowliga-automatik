@@ -126,7 +126,11 @@ function getAutodartsGameData($matchId)
 
   if ($lookup_results['error'] !== null) {
     // Handle the error
-    return includeWithVariables('app_data/partials/report-error.php', $lookup_results['error']);
+    $error_data = array_merge(
+      $lookup_results['error'],
+      ['game_id' => $matchId]
+    );
+    return includeWithVariables('app_data/partials/report-error.php', $error_data);
   }
 
   $date = (new DateTime($matchData['createdAt']))->format('d.m.Y');
@@ -416,7 +420,11 @@ function getLidartsGameData($game_id, $last_leg_winner, $loser_rest, $winner_fin
 
   if ($lookup_results['error'] !== null) {
     // Handle the error
-    return includeWithVariables('app_data/partials/report-error.php', $lookup_results['error']);
+    $error_data = array_merge(
+      $lookup_results['error'],
+      ['game_id' => $game_id]
+    );
+    return includeWithVariables('app_data/partials/report-error.php', $error_data);
   }
   // Use the existing calculateRestSumAndWinner function
   calculateRestSumAndWinner($rest, $players);

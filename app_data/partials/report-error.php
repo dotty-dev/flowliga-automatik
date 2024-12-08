@@ -140,11 +140,12 @@
 
 
           echo $error_text;
+          echo $error_reason;
           ?>
         </section>
       <?php }
 
-      if ($error_reason == 'lastLegUnfinished') { ?>
+      if (isset($error_reason) && $error_reason == 'lastLegUnfinished') { ?>
         <form method="post" action="./">
           <input type="hidden" name="game" value="<?php echo $game_id ?>">
           <label for="last-leg-won">Gewinner des letzten Legs</label>

@@ -254,7 +254,7 @@ function lookupLeagueNameAndDiscordIDs($players, $players_lidarts_array)
     ];
   } elseif ($playerNames[2] === false) {
     $error = [
-      'reason' => 'playerNotFound',
+      'error_reason' => 'playerNotFound',
       'player_name' => $players[2]['name']
     ];
   }
