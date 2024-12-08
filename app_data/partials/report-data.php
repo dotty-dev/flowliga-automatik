@@ -124,6 +124,11 @@ function getAutodartsGameData($matchId)
   $players[1]['name'] = $lookup_results['playerNames'][1];
   $players[2]['name'] = $lookup_results['playerNames'][2];
 
+  if ($lookup_results['error'] !== null) {
+    // Handle the error
+    return includeWithVariables('app_data/partials/report-error.php', $lookup_results['error']);
+  }
+
   $date = (new DateTime($matchData['createdAt']))->format('d.m.Y');
 
   return [
