@@ -140,7 +140,6 @@
 
 
           echo $error_text;
-          echo $error_reason;
           ?>
         </section>
       <?php }
