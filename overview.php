@@ -181,6 +181,7 @@ foreach ($results_array as $result) {
   <link rel="stylesheet" href="assets/pico-custom.css">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheer" href="https://cdn.datatables.net/2.1.0/css/dataTables.dataTables.min.css">
+  <link rel="stylesheet" href="https://cdn.datatables.net/fixedheader/3.4.0/css/fixedHeader.dataTables.min.css">
   <style>
     .submitted td {
       font-weight: bolder;
@@ -245,6 +246,45 @@ foreach ($results_array as $result) {
 
     .justify-end {
       justify-self: end;
+    }
+
+    .dtfh-floatingparent {
+      top: 0 !important;
+    }
+
+    .dtfh-floatingparent thead tr th {
+      background-color: var(--background-color);
+    }
+
+    .dtfh-floatingparent thead tr th .dt-column-title {
+      background: none;
+      border: none;
+      padding: 0 !important;
+      margin: 0 !important;
+    }
+
+    /* Styles for light mode */
+    @media (prefers-color-scheme: light) {
+
+      #players-table th,
+      #players-table th span[role="button"],
+      #players-table th span[role="button"]::after,
+      .dtfh-floatingparent thead tr th .dt-column-title {
+        color: #11191f;
+        /* Dark color for light mode */
+      }
+    }
+
+    /* Styles for dark mode */
+    @media (prefers-color-scheme: dark) {
+
+      #players-table th,
+      #players-table th span[role="button"],
+      #players-table th span[role="button"]::after,
+      .dtfh-floatingparent thead tr th .dt-column-title {
+        color: #ffffff;
+        /* Light color for dark mode */
+      }
     }
   </style>
   <title>Flow Liga Spielbericht Automatik</title>
@@ -514,6 +554,7 @@ foreach ($results_array as $result) {
   <script src="assets/pico-modal.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script src="https://cdn.datatables.net/2.1.0/js/dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/fixedheader/3.4.0/js/dataTables.fixedHeader.min.js"></script>
   <script>
     const gamesContainer = document.querySelector('#games');
     const playersContainer = document.querySelector('#players');
@@ -636,6 +677,7 @@ foreach ($results_array as $result) {
       language: {
         url: 'https://cdn.datatables.net/plug-ins/2.1.0/i18n/de-DE.json',
       },
+      fixedHeader: true
     });
   </script>
 
