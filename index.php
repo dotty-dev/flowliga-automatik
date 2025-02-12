@@ -73,7 +73,7 @@ if (isset($game_id) && $manual_report === false) {
       break;
     default:
       return includeWithVariables('app_data/partials/report-error.php', array(
-        'error_reason' => 'wrongMode',
+        'error_reason' => 'test',
       ));
   }
   if (is_array($game_data)) {

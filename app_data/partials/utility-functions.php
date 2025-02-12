@@ -272,8 +272,8 @@ function determinePlatform($game_id)
     return 'lidarts';
   }
 
-  // Check if it's an autodarts game (UUID v4 format)
-  if (preg_match('/^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i', $game_id)) {
+  // Check if it's any valid UUID format
+  if (preg_match('/^[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}$/i', $game_id)) {
     return 'autodarts';
   }
 

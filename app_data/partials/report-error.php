@@ -37,8 +37,17 @@
           // Add base URLs for lidarts and autodarts
           $lidarts_base_url = "https://lidarts.org/game/";
           $autodarts_base_url = "https://play.autodarts.io/history/matches/";
+          $playedOn = "";
+          $idLength = strlen($game_id);
           if (isset($game_id) && !empty($game_id)) {
-          $game_url = (strlen($game_id) !== 8) ? $autodarts_base_url . $game_id : $lidarts_base_url . $game_id;
+            if (strlen($game_id) !== 8) {
+              $game_url = $autodarts_base_url . $game_id;
+              $playedOn = "Autodarts";
+            } else {
+              $game_url = $lidarts_base_url . $game_id;
+              $playedOn = "Lidarts";
+            }
+            $game_url = (strlen($game_id) !== 8) ? $autodarts_base_url . $game_id : $lidarts_base_url . $game_id;
           }
           switch ($error_reason) {
             case 'gameNotFound':
@@ -52,28 +61,28 @@
               break;
             case 'noPairing':
               $error_text = "Es konnte keine Spielpaarung für \"$player1_name\" gegen \"$player2_name\" gefunden werden.";
-              $error_post_text = "$error_text Lidarts Spiel: $game_url";
+              $error_post_text = "$error_text $playedOn Spiel: $game_url";
               $error_text = "$error_text Die Ligaleitung ist informiert und kümmert sich um das Problem.";
               break;
             case 'wrongMode':
-              $error_text = "Das angegebene Lidarts Spiel hat den falschen Spielmodus, der Bericht für dieses Spiel muss per Hand erstellt werden.";
+              $error_text = "Das angegebene $playedOn Spiel hat den falschen Spielmodus, der Bericht für dieses Spiel muss per Hand erstellt werden.";
               break;
             case 'playersNotFoundBoth':
-              $error_text = "Die Lidarts-Accounts \"$player1_name\" und \"$player2_name\" konnten keinen Ligateilnehmern zugeordnet werden.";
-              $error_post_text = "$error_text Lidarts Spiel: $game_url";
+              $error_text = "Die $playedOn-Accounts \"$player1_name\" und \"$player2_name\" konnten keinen Ligateilnehmern zugeordnet werden.";
+              $error_post_text = "$error_text $playedOn Spiel: $game_url";
               $error_text = "$error_text Die Ligaleitung ist informiert und kümmert sich um das Problem.";
               break;
             case 'playerNotFound':
-              $error_text = "Der Lidarts-Account \"$player_name\" konnte keinem Ligateilnehmer zugeorgnet werden.";
-              $error_post_text = "$error_text Lidarts Spiel: $game_url";
+              $error_text = "Der $playedOn-Account \"$player_name\" konnte keinem Ligateilnehmer zugeorgnet werden.";
+              $error_post_text = "$error_text $playedOn Spiel: $game_url";
               $error_text = "$error_text Die Ligaleitung ist informiert und kümmert sich um das Problem.";
               break;
             case 'webhookErrors':
               $error_text = "Beim senden an Discord ist ein Fehler aufgetreten. Die Ligaleitung ist informiert und kümmert sich um das Problem.";
               break;
             case 'noPlayersFile':
-              $error_text = "Die Auflösungsdatei für Liganame/Lidartsname/DiscordID konnte nicht geladen werden.";
-              $error_post_text = "$error_text (players.csv)";
+              $error_text = "Die Auflösungsdatei für Liganame/" . $playedOn . "name/DiscordID konnte nicht geladen werden.";
+              $error_post_text = "$error_text (players.csv /  players-autodarts.csv)";
               break;
             case 'noPairingsFile':
               $error_text = "Die Auflösungsdatei für die Spielpaarungen konnte nicht geladen werden.";
@@ -84,6 +93,9 @@
               $error_post_text = "$error_text (overview.csv)";
             case 'reportAlreadySubmitted':
               $error_text = "Der Bericht für dieses Spiel wurde bereits übermittelt!";
+              break;
+            case 'test':
+              $error_text = "This is the test error message.";
               break;
             default:
               break;
