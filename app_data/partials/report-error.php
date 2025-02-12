@@ -78,7 +78,7 @@
               $error_text = "$error_text Die Ligaleitung ist informiert und kümmert sich um das Problem.";
               break;
             case 'webhookErrors':
-              $error_text = "Beim senden an Discord ist ein Fehler aufgetreten. Die Ligaleitung ist informiert und kümmert sich um das Problem.";
+              $error_text = "Beim senden an Discord ist ein Fehler aufgetreten. Bitte wende dich an die Ligaleitung, um den Fehler zu beheben.";
               break;
             case 'noPlayersFile':
               $error_text = "Die Auflösungsdatei für Liganame/" . $playedOn . "name/DiscordID konnte nicht geladen werden.";
@@ -94,8 +94,8 @@
             case 'reportAlreadySubmitted':
               $error_text = "Der Bericht für dieses Spiel wurde bereits übermittelt!";
               break;
-            case 'test':
-              $error_text = "This is the test error message.";
+            case 'unkownPlatform':
+              $error_text = "Die Spiel-Plattform konnte nicht erkannt werden. Bitte wende dich an die Ligaleitung, um den Fehler zu beheben.";
               break;
             default:
               break;

@@ -73,7 +73,8 @@ if (isset($game_id) && $manual_report === false) {
       break;
     default:
       return includeWithVariables('app_data/partials/report-error.php', array(
-        'error_reason' => 'test',
+        'error_reason' => 'unkownPlatform',
+        'game_id' => $game_id
       ));
   }
   if (is_array($game_data)) {
